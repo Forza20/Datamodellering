@@ -1,0 +1,33 @@
+table security
+	isHidden
+	lineageTag: c94d2442-3d70-4954-bdd1-2ed8c71de04e
+
+	column user_email
+		dataType: string
+		isHidden
+		lineageTag: 41eb1403-39f5-44ca-b3c5-de81ebe192cc
+		summarizeBy: none
+		sourceColumn: user_email
+
+		annotation SummarizationSetBy = Automatic
+
+	column region
+		dataType: string
+		isHidden
+		lineageTag: b9d28e02-9b1c-4fd2-bc50-fb469cf6f45d
+		summarizeBy: none
+		sourceColumn: region
+
+		annotation SummarizationSetBy = Automatic
+
+	partition security = m
+		mode: import
+		queryGroup: Gold
+		source =
+				let
+					Omdoebt = Table.RenameColumns(slv_security, {{"UserEmail", "user_email"}, {"Region", "region"}}),
+					Valgt = Table.SelectColumns(Omdoebt, {"user_email", "region"})
+				in
+					Valgt
+
+	annotation PBI_ResultType = Table

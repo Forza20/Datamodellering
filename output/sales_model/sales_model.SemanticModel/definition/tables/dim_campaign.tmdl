@@ -1,0 +1,74 @@
+table dim_campaign
+	lineageTag: c03f6aaf-c51c-45ec-a1e9-baa953766fc2
+
+	column campaign_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 999d8ff1-714a-4632-8ba8-ae11cffc4e8f
+		summarizeBy: none
+		sourceColumn: campaign_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column campaign_name
+		dataType: string
+		lineageTag: 659ad89e-e01d-4fde-80d4-a3fae0746e89
+		summarizeBy: none
+		sourceColumn: campaign_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column marketing_channel
+		dataType: string
+		lineageTag: 184ab523-ee53-4103-af76-d52bbc0ff311
+		summarizeBy: none
+		sourceColumn: marketing_channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column start_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 29129d8a-288c-424b-b0a4-d830420e2bcf
+		summarizeBy: none
+		sourceColumn: start_date
+
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column end_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 76ce2694-fb70-4227-9ccd-e6918f1033a5
+		summarizeBy: none
+		sourceColumn: end_date
+
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column budget
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		lineageTag: d76616cb-0d9a-4414-87f5-b6619fc2ebf4
+		summarizeBy: none
+		sourceColumn: budget
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_campaign = m
+		mode: import
+		queryGroup: Gold
+		source =
+				let
+					Kampagner = Table.Distinct(Table.SelectColumns(slv_campaign_log, {"CampaignName", "Channel", "StartDate", "EndDate", "Budget"}), {"CampaignName"}),
+					Sorteret = Table.Buffer(Table.Sort(Kampagner, {{"StartDate", Order.Ascending}, {"CampaignName", Order.Ascending}})),
+					MedKey = Table.AddIndexColumn(Sorteret, "campaign_key", 1, 1, Int64.Type),
+					Omdoebt = Table.RenameColumns(MedKey, {{"CampaignName", "campaign_name"}, {"Channel", "marketing_channel"}, {"StartDate", "start_date"}, {"EndDate", "end_date"}, {"Budget", "budget"}}),
+					Valgt = Table.SelectColumns(Omdoebt, {"campaign_key", "campaign_name", "marketing_channel", "start_date", "end_date", "budget"}),
+					Typer = Table.TransformColumnTypes(Valgt, {{"campaign_key", Int64.Type}, {"campaign_name", type text}, {"marketing_channel", type text}, {"start_date", type date}, {"end_date", type date}, {"budget", Currency.Type}})
+				in
+					Typer
+
+	annotation PBI_ResultType = Table

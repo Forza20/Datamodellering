@@ -1,0 +1,35 @@
+table fact_sales_target
+	lineageTag: c254a1e9-fb10-49bb-9392-7532755ffa33
+
+	column date_key
+		dataType: dateTime
+		isHidden
+		formatString: yyyy-mm-dd
+		lineageTag: 6b8dd908-7ce0-40bc-88f5-62607d87e6bb
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column target_amount
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		lineageTag: 79736bfb-8c75-4d33-a767-8169672e8ff3
+		summarizeBy: none
+		sourceColumn: target_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_sales_target = m
+		mode: import
+		queryGroup: Gold
+		source =
+				let
+					Omdoebt = Table.RenameColumns(slv_sales_target, {{"MonthStart", "date_key"}, {"TargetRevenue", "target_amount"}}),
+					Typer = Table.TransformColumnTypes(Omdoebt, {{"date_key", type date}, {"target_amount", Currency.Type}})
+				in
+					Typer
+
+	annotation PBI_ResultType = Table

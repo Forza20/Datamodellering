@@ -1,0 +1,48 @@
+relationship 820bfd4a-0d9f-42f6-b773-49e9a9d5d2e6
+	fromColumn: fact_sales.date_key
+	toColumn: dim_date.date_key
+
+relationship f676458a-bd5b-49fc-bb71-03acb85262d1
+	fromColumn: fact_sales.customer_key
+	toColumn: dim_customer.customer_key
+
+relationship e0b522b6-aa0d-496b-8df6-97116e740c02
+	fromColumn: fact_sales.product_key
+	toColumn: dim_product.product_key
+
+relationship d7d862e1-531c-4cba-ba24-237801586017
+	fromColumn: fact_sales.channel_key
+	toColumn: dim_channel.channel_key
+
+relationship af4033ea-b256-4c2f-ae62-35da119eb36a
+	fromColumn: fact_sales.region_key
+	toColumn: dim_region.region_key
+
+relationship 39e1bec2-96ed-4977-a19e-308da3ad641b
+	fromColumn: fact_campaign_spend.date_key
+	toColumn: dim_date.date_key
+
+relationship 0e1d80aa-6b54-4ea4-a187-5afdf5044962
+	fromColumn: fact_campaign_spend.campaign_key
+	toColumn: dim_campaign.campaign_key
+
+relationship ebb9266f-8731-47a4-b91c-7ef4630fea61
+	fromColumn: fact_inventory.date_key
+	toColumn: dim_date.date_key
+
+relationship 7978d90f-0998-4f81-aad7-9ec86f122e07
+	fromColumn: fact_inventory.product_key
+	toColumn: dim_product.product_key
+
+relationship 254c5cfa-0a1a-4974-bcd3-09d18cdf99b7
+	fromColumn: fact_sales_target.date_key
+	toColumn: dim_date.date_key
+
+relationship eb62cd80-8714-4049-a0bd-f8819ac5243d
+	fromColumn: bridge_campaign_product.campaign_key
+	toColumn: dim_campaign.campaign_key
+
+relationship 64ca9de5-ea92-4def-b450-df3f14440f86
+	fromColumn: bridge_campaign_product.product_key
+	toColumn: dim_product.product_key
+

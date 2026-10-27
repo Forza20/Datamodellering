@@ -1,0 +1,140 @@
+// sales_model - gold-lag (stjerneskema)
+// Indsæt på https://dbdiagram.io/d
+// -1 = Ukendt-række i dimensioner med surrogatnøgle
+
+Project sales_model {
+  database_type: 'Power BI (Import)'
+  Note: 'Kilde: data/silver/Silver_Excel.xlsx. Kun USD.'
+}
+
+// ---------- Dimensioner ----------
+
+Table dim_date {
+  date_key date [pk, note: 'Markeret datotabel, 2025-01-01..2026-12-31']
+  year int
+  quarter varchar
+  month_no int
+  month_name varchar [note: 'Sorteres efter month_no']
+  year_month varchar
+  month_start date
+  week_no int
+}
+
+Table dim_customer {
+  customer_key int [pk, note: 'Surrogatnøgle, -1 = Ukendt']
+  customer_id int [note: 'CUST_MASTER.CustomerID']
+  customer_name varchar
+  segment varchar
+  account_manager varchar
+  payment_terms varchar
+  credit_limit decimal
+  street varchar
+  city varchar
+  region varchar [note: 'Kundens adresse-region']
+  primary_contact varchar
+}
+
+Table dim_product {
+  product_key int [pk, note: 'Surrogatnøgle, -1 = Ukendt']
+  product_code varchar
+  product_name varchar
+  brand varchar
+  category varchar
+  subcategory varchar
+  list_price decimal
+  primary_supplier varchar
+}
+
+Table dim_channel {
+  channel_key int [pk, note: '10 Web, 20 Butik, 30 Telefon, 40 Partner, -1 Ukendt']
+  channel_name varchar
+}
+
+Table dim_region {
+  region_key int [pk, note: 'Surrogatnøgle, -1 = Ukendt. RLS filtrerer her']
+  region_name varchar
+}
+
+Table dim_campaign {
+  campaign_key int [pk]
+  campaign_name varchar
+  marketing_channel varchar
+  start_date date
+  end_date date
+  budget decimal
+}
+
+Table bridge_campaign_product {
+  campaign_key int [ref: > dim_campaign.campaign_key]
+  product_key int [ref: > dim_product.product_key]
+  Note: 'Fra campaign_skus. DSC-001 findes ikke og er udeladt'
+  indexes {
+    (campaign_key, product_key) [pk]
+  }
+}
+
+// ---------- Fakta ----------
+
+Table fact_sales {
+  line_id varchar [pk, note: 'Grain: én ordrelinje']
+  order_id varchar
+  date_key date [ref: > dim_date.date_key, note: 'Ordredato']
+  customer_key int [ref: > dim_customer.customer_key]
+  product_key int [ref: > dim_product.product_key]
+  channel_key int [ref: > dim_channel.channel_key]
+  region_key int [ref: > dim_region.region_key, note: 'Ordrens RegionName']
+  order_status varchar [note: 'Leveret / Afsendt / Under behandling']
+  order_priority varchar
+  quantity int
+  unit_price decimal
+  discount_pct decimal
+  gross_amount decimal [note: 'Quantity x UnitPrice (= LineTotal)']
+  discount_amount decimal
+  net_amount decimal [note: 'Efter rabat']
+  cost_amount decimal
+}
+
+Table fact_campaign_spend {
+  date_key date [ref: > dim_date.date_key]
+  campaign_key int [ref: > dim_campaign.campaign_key]
+  impressions int
+  clicks int
+  spend decimal
+  Note: 'Grain: én kampagne pr. dag'
+}
+
+Table fact_inventory {
+  date_key date [ref: > dim_date.date_key, note: 'Månedstart']
+  product_key int [ref: > dim_product.product_key]
+  stock_qty int
+  Note: 'Grain: ét produkt pr. måned (snapshot, må ikke summeres over tid)'
+}
+
+Table fact_sales_target {
+  date_key date [ref: > dim_date.date_key, note: 'Månedstart']
+  target_amount decimal
+  Note: 'Grain: én måned (samlet mål, ingen region)'
+}
+
+// ---------- Hjælpetabel ----------
+
+Table security {
+  user_email varchar [pk]
+  region varchar [note: 'Matcher dim_region.region_name via LOOKUPVALUE (ingen relation)']
+}
+
+TableGroup dimensioner {
+  dim_date
+  dim_customer
+  dim_product
+  dim_channel
+  dim_region
+  dim_campaign
+}
+
+TableGroup fakta {
+  fact_sales
+  fact_campaign_spend
+  fact_inventory
+  fact_sales_target
+}

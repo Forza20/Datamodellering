@@ -1,0 +1,35 @@
+{
+    "id":  0,
+    "resourcePackages":  [
+                             {
+                                 "resourcePackage":  {
+                                                         "name":  "SharedResources",
+                                                         "type":  2,
+                                                         "items":  [
+                                                                       {
+                                                                           "type":  202,
+                                                                           "path":  "BaseThemes/CY26SU05.json",
+                                                                           "name":  "CY26SU05"
+                                                                       }
+                                                                   ],
+                                                         "disabled":  false
+                                                     }
+                             }
+                         ],
+    "sections":  [
+                     {
+                         "config":  "{}",
+                         "displayName":  "Oversigt",
+                         "displayOption":  1,
+                         "filters":  "[]",
+                         "height":  720,
+                         "name":  "ReportSection",
+                         "visualContainers":  [
+
+                                              ],
+                         "width":  1280
+                     }
+                 ],
+    "config":  "{\"version\":\"5.73\",\"themeCollection\":{\"baseTheme\":{\"name\":\"CY26SU05\",\"type\":2,\"version\":{\"visual\":\"2.9.0\",\"report\":\"3.3.0\",\"page\":\"2.3.1\"}}},\"activeSectionIndex\":1,\"defaultDrillFilterOtherVisuals\":true,\"linguisticSchemaSyncVersion\":2,\"settings\":{\"useNewFilterPaneExperience\":true,\"allowChangeFilterTypes\":true,\"useStylableVisualContainerHeader\":true,\"queryLimitOption\":6,\"useEnhancedTooltips\":true,\"exportDataMode\":1,\"useDefaultAggregateDisplayName\":true},\"objects\":{\"section\":[{\"properties\":{\"verticalAlignment\":{\"expr\":{\"Literal\":{\"Value\":\"\u0027Top\u0027\"}}}}}]}}",
+    "layoutOptimization":  0
+}

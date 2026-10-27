@@ -1,0 +1,99 @@
+table dim_date
+	dataCategory: Time
+	lineageTag: fbf9dc7d-e2cf-4a97-91f8-52f85fb7df0b
+
+	column date_key
+		dataType: dateTime
+		isKey
+		formatString: yyyy-mm-dd
+		lineageTag: 7fba0a7e-d223-4042-824c-1b4f9998427a
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: bc42dbd9-6ee4-446a-a90a-0075c1f1524b
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter
+		dataType: string
+		lineageTag: 163a4a71-51ce-4752-b315-1d4694369bc6
+		summarizeBy: none
+		sourceColumn: quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_no
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e94abc5f-1d8d-4d05-b377-d34116c6b148
+		summarizeBy: none
+		sourceColumn: month_no
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_name
+		dataType: string
+		lineageTag: e04a959b-fafd-4bda-8f6e-c438baaf5f24
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: month_no
+
+		annotation SummarizationSetBy = Automatic
+
+	column year_month
+		dataType: string
+		lineageTag: d9e4816a-0616-403d-b6c7-29293b73fbbc
+		summarizeBy: none
+		sourceColumn: year_month
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_start
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: d24eece0-fc88-4999-bc61-796c5a236d7c
+		summarizeBy: none
+		sourceColumn: month_start
+
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column week_no
+		dataType: int64
+		formatString: 0
+		lineageTag: 0b312cab-6a92-4405-ac8d-2d9494c6cfd1
+		summarizeBy: none
+		sourceColumn: week_no
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_date = m
+		mode: import
+		queryGroup: Gold
+		source =
+				let
+					Datoer = List.Combine({slv_order[OrderDate], slv_sales_target[MonthStart], slv_campaign_log[Date], slv_inventory[MonthStart]}),
+					Start = #date(Date.Year(List.Min(Datoer)), 1, 1),
+					Slut = #date(Date.Year(List.Max(Datoer)), 12, 31),
+					Liste = List.Dates(Start, Duration.Days(Slut - Start) + 1, #duration(1, 0, 0, 0)),
+					Tabel = Table.FromList(Liste, Splitter.SplitByNothing(), type table [date_key = date]),
+					Aar = Table.AddColumn(Tabel, "year", each Date.Year([date_key]), Int64.Type),
+					Kvartal = Table.AddColumn(Aar, "quarter", each "K" & Text.From(Date.QuarterOfYear([date_key])), type text),
+					MaanedNr = Table.AddColumn(Kvartal, "month_no", each Date.Month([date_key]), Int64.Type),
+					Maaned = Table.AddColumn(MaanedNr, "month_name", each Date.ToText([date_key], [Format = "MMM", Culture = "da-DK"]), type text),
+					AarMaaned = Table.AddColumn(Maaned, "year_month", each Date.ToText([date_key], [Format = "yyyy-MM"]), type text),
+					Maanedstart = Table.AddColumn(AarMaaned, "month_start", each Date.StartOfMonth([date_key]), type date),
+					Uge = Table.AddColumn(Maanedstart, "week_no", each Date.WeekOfYear([date_key], Day.Monday), Int64.Type)
+				in
+					Uge
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,38 @@
+table dim_region
+	lineageTag: 69210277-b789-480d-8c79-ff412b82d8e0
+
+	column region_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 875babf0-7e64-4b3e-9818-144b07474656
+		summarizeBy: none
+		sourceColumn: region_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column region_name
+		dataType: string
+		lineageTag: 0ebc49ab-2c2c-4055-bac9-0c347071d515
+		summarizeBy: none
+		sourceColumn: region_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_region = m
+		mode: import
+		queryGroup: Gold
+		source =
+				let
+					Regioner = Table.Distinct(Table.SelectColumns(slv_city, {"RegionName"})),
+					Sorteret = Table.Buffer(Table.Sort(Regioner, {{"RegionName", Order.Ascending}})),
+					MedKey = Table.AddIndexColumn(Sorteret, "region_key", 1, 1, Int64.Type),
+					Omdoebt = Table.RenameColumns(MedKey, {{"RegionName", "region_name"}}),
+					Valgt = Table.SelectColumns(Omdoebt, {"region_key", "region_name"}),
+					Typer = Table.TransformColumnTypes(Valgt, {{"region_key", Int64.Type}, {"region_name", type text}}),
+					Ukendt = #table(Value.Type(Typer), {{-1, "Ukendt"}}),
+					Samlet = Table.Combine({Typer, Ukendt})
+				in
+					Samlet
+
+	annotation PBI_ResultType = Table

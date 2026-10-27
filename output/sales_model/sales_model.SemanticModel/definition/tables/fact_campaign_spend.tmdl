@@ -1,0 +1,68 @@
+table fact_campaign_spend
+	lineageTag: d055a5d3-e14f-4157-bd0c-b0892131339d
+
+	column date_key
+		dataType: dateTime
+		isHidden
+		formatString: yyyy-mm-dd
+		lineageTag: 53b062d3-ea12-4b39-90af-4e2573c556e9
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column campaign_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 85bf9d05-6cc5-49a5-b9e1-a3289f7b3d31
+		summarizeBy: none
+		sourceColumn: campaign_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column impressions
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5f9060d0-21af-4436-985a-b51084382f58
+		summarizeBy: none
+		sourceColumn: impressions
+
+		annotation SummarizationSetBy = Automatic
+
+	column clicks
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7daa7106-995a-4d61-b9f2-e13060574c3b
+		summarizeBy: none
+		sourceColumn: clicks
+
+		annotation SummarizationSetBy = Automatic
+
+	column spend
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		lineageTag: e4345dd5-917f-41d7-a0a8-91474f4593a3
+		summarizeBy: none
+		sourceColumn: spend
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_campaign_spend = m
+		mode: import
+		queryGroup: Gold
+		source =
+				let
+					Kampagne = Table.NestedJoin(slv_campaign_log, {"CampaignName"}, dim_campaign, {"campaign_name"}, "C", JoinKind.Inner),
+					KampagneUd = Table.ExpandTableColumn(Kampagne, "C", {"campaign_key"}),
+					Omdoebt = Table.RenameColumns(KampagneUd, {{"Date", "date_key"}, {"Impressions", "impressions"}, {"Clicks", "clicks"}, {"Spend", "spend"}}),
+					Valgt = Table.SelectColumns(Omdoebt, {"date_key", "campaign_key", "impressions", "clicks", "spend"}),
+					Typer = Table.TransformColumnTypes(Valgt, {{"date_key", type date}, {"campaign_key", Int64.Type}, {"impressions", Int64.Type}, {"clicks", Int64.Type}, {"spend", Currency.Type}})
+				in
+					Typer
+
+	annotation PBI_ResultType = Table

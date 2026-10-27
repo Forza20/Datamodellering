@@ -1,0 +1,241 @@
+expression ExcelSti = "C:\Users\maria\Desktop\Claude\Data Modeling\data\silver\Silver_Excel.xlsx" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	lineageTag: 7f05c70e-3f81-452c-96bf-00918cfbe99e
+	queryGroup: Parametre
+
+	annotation PBI_ResultType = Text
+
+expression Kilde =
+		let
+			Kilde = Excel.Workbook(File.Contents(ExcelSti), null, true)
+		in
+			Kilde
+	lineageTag: b0139be3-1f96-4582-a4a7-e661b3e230e0
+	queryGroup: Parametre
+
+	annotation PBI_ResultType = Table
+
+expression slv_customer =
+		let
+			Ark = Kilde{[Item = "CUST_MASTER", Kind = "Sheet"]}[Data],
+			Headers = Table.PromoteHeaders(Ark, [PromoteAllScalars = true]),
+			Valgt = Table.SelectColumns(Headers, {"CustomerID", "CustomerName", "Segment", "AddressID", "AccountManager", "PaymentTerms"}),
+			Typer = Table.TransformColumnTypes(Valgt, {{"CustomerID", Int64.Type}, {"CustomerName", type text}, {"Segment", type text}, {"AddressID", Int64.Type}, {"AccountManager", type text}, {"PaymentTerms", type text}}, "en-US"),
+			Trimmet = Table.TransformColumns(Typer, {{"CustomerName", Text.Trim, type text}, {"Segment", Text.Trim, type text}, {"AccountManager", Text.Trim, type text}, {"PaymentTerms", Text.Trim, type text}}),
+			UdenTest = Table.SelectRows(Trimmet, each [CustomerID] <> 9999),
+			Unikke = Table.Distinct(UdenTest, {"CustomerID"})
+		in
+			Unikke
+	lineageTag: a6a4d264-b210-4747-8293-f4db2d8fb186
+	queryGroup: Silver
+
+	annotation PBI_ResultType = Table
+
+expression slv_address =
+		let
+			Ark = Kilde{[Item = "Address", Kind = "Sheet"]}[Data],
+			Headers = Table.PromoteHeaders(Ark, [PromoteAllScalars = true]),
+			Valgt = Table.SelectColumns(Headers, {"AddressID", "Street", "CityName"}),
+			Typer = Table.TransformColumnTypes(Valgt, {{"AddressID", Int64.Type}, {"Street", type text}, {"CityName", type text}}, "en-US"),
+			Trimmet = Table.TransformColumns(Typer, {{"Street", Text.Trim, type text}, {"CityName", Text.Trim, type text}}),
+			Unikke = Table.Distinct(Trimmet, {"AddressID"})
+		in
+			Unikke
+	lineageTag: 3545d635-75b4-4ee9-be0b-672cc1ab81dc
+	queryGroup: Silver
+
+	annotation PBI_ResultType = Table
+
+expression slv_city =
+		let
+			Ark = Kilde{[Item = "cities", Kind = "Sheet"]}[Data],
+			Headers = Table.PromoteHeaders(Ark, [PromoteAllScalars = true]),
+			Valgt = Table.SelectColumns(Headers, {"CityName", "RegionName"}),
+			Typer = Table.TransformColumnTypes(Valgt, {{"CityName", type text}, {"RegionName", type text}}, "en-US"),
+			Trimmet = Table.TransformColumns(Typer, {{"CityName", Text.Trim, type text}, {"RegionName", Text.Trim, type text}}),
+			Unikke = Table.Distinct(Trimmet, {"CityName"})
+		in
+			Unikke
+	lineageTag: 9cba75d4-5d3b-4665-b625-6e24d901474f
+	queryGroup: Silver
+
+	annotation PBI_ResultType = Table
+
+expression slv_credit =
+		let
+			Ark = Kilde{[Item = "user_details", Kind = "Sheet"]}[Data],
+			Headers = Table.PromoteHeaders(Ark, [PromoteAllScalars = true]),
+			Valgt = Table.SelectColumns(Headers, {"UserID", "CreditLimit"}),
+			Typer = Table.TransformColumnTypes(Valgt, {{"UserID", Int64.Type}, {"CreditLimit", type number}}, "en-US"),
+			Omdoebt = Table.RenameColumns(Typer, {{"UserID", "CustomerID"}}),
+			Unikke = Table.Distinct(Omdoebt, {"CustomerID"})
+		in
+			Unikke
+	lineageTag: 4ffdf5f4-e434-459b-a463-b2e11c535a33
+	queryGroup: Silver
+
+	annotation PBI_ResultType = Table
+
+expression slv_contact =
+		let
+			Ark = Kilde{[Item = "customer_contacts", Kind = "Sheet"]}[Data],
+			Headers = Table.PromoteHeaders(Ark, [PromoteAllScalars = true]),
+			Valgt = Table.SelectColumns(Headers, {"CustomerID", "ContactName", "IsPrimary"}),
+			Typer = Table.TransformColumnTypes(Valgt, {{"CustomerID", Int64.Type}, {"ContactName", type text}}, "en-US"),
+			Trimmet = Table.TransformColumns(Typer, {{"ContactName", Text.Trim, type text}}),
+			Primaer = Table.SelectRows(Trimmet, each Text.Lower(Text.From([IsPrimary])) = "true"),
+			KunNavn = Table.SelectColumns(Primaer, {"CustomerID", "ContactName"}),
+			Unikke = Table.Distinct(KunNavn, {"CustomerID"})
+		in
+			Unikke
+	lineageTag: a83abb63-15a9-4c28-ac9e-994acde8806d
+	queryGroup: Silver
+
+	annotation PBI_ResultType = Table
+
+expression slv_product =
+		let
+			Ark = Kilde{[Item = "products", Kind = "Sheet"]}[Data],
+			Headers = Table.PromoteHeaders(Ark, [PromoteAllScalars = true]),
+			Valgt = Table.SelectColumns(Headers, {"ProductCode", "ProductName", "Brand", "SubcategoryName", "UnitPrice", "PrimarySupplier"}),
+			Typer = Table.TransformColumnTypes(Valgt, {{"ProductCode", type text}, {"ProductName", type text}, {"Brand", type text}, {"SubcategoryName", type text}, {"UnitPrice", type number}, {"PrimarySupplier", type text}}, "en-US"),
+			Trimmet = Table.TransformColumns(Typer, {{"ProductCode", Text.Trim, type text}, {"ProductName", Text.Trim, type text}, {"Brand", Text.Trim, type text}, {"SubcategoryName", Text.Trim, type text}, {"PrimarySupplier", Text.Trim, type text}}),
+			// Fjern testproduktet og de tomme dubletter (ingen brand/pris)
+			UdenTest = Table.SelectRows(Trimmet, each [ProductCode] <> "ZZZ-000" and [Brand] <> null and [Brand] <> ""),
+			UnikKode = Table.Distinct(UdenTest, {"ProductCode"}),
+			UnikNavn = Table.Distinct(UnikKode, {"ProductName"})
+		in
+			UnikNavn
+	lineageTag: 9694f98a-9342-4ac4-9a69-abb80c61aef3
+	queryGroup: Silver
+
+	annotation PBI_ResultType = Table
+
+expression slv_subcategory =
+		let
+			Ark = Kilde{[Item = "subcategories", Kind = "Sheet"]}[Data],
+			Headers = Table.PromoteHeaders(Ark, [PromoteAllScalars = true]),
+			Typer = Table.TransformColumnTypes(Headers, {{"CategorySubcategory", type text}}, "en-US"),
+			Delt = Table.SplitColumn(Typer, "CategorySubcategory", Splitter.SplitTextByDelimiter("|"), {"Category", "Subcategory"}),
+			Pyntet = Table.TransformColumns(Delt, {{"Category", each Text.Proper(Text.Trim(_)), type text}, {"Subcategory", each Text.Proper(Text.Trim(_)), type text}}),
+			Unikke = Table.Distinct(Pyntet, {"Subcategory"})
+		in
+			Unikke
+	lineageTag: f32ed54f-2966-46ca-95c9-1616965ff76f
+	queryGroup: Silver
+
+	annotation PBI_ResultType = Table
+
+expression slv_order =
+		let
+			Ark25 = Table.PromoteHeaders(Kilde{[Item = "ORDERS_2025", Kind = "Sheet"]}[Data], [PromoteAllScalars = true]),
+			Ark26 = Table.PromoteHeaders(Kilde{[Item = "ORDERS_2026", Kind = "Sheet"]}[Data], [PromoteAllScalars = true]),
+			// 2025 har ekstra kolonner (LegacyRef, SourceFile) - reducer til faelles kolonner
+			Kolonner = {"OrderID", "CustomerName", "RegionName", "OrderDate", "OrderChannel", "Status", "Priority"},
+			Samlet = Table.Combine({Table.SelectColumns(Ark25, Kolonner), Table.SelectColumns(Ark26, Kolonner)}),
+			Typer = Table.TransformColumnTypes(Samlet, {{"OrderID", type text}, {"CustomerName", type text}, {"RegionName", type text}, {"OrderDate", type datetime}, {"OrderChannel", Int64.Type}, {"Status", type text}, {"Priority", type text}}, "en-US"),
+			KunDato = Table.TransformColumns(Typer, {{"OrderDate", Date.From, type date}}),
+			Trimmet = Table.TransformColumns(KunDato, {{"OrderID", Text.Trim, type text}, {"CustomerName", Text.Trim, type text}, {"RegionName", Text.Trim, type text}, {"Status", Text.Trim, type text}, {"Priority", Text.Trim, type text}}),
+			Unikke = Table.Distinct(Trimmet, {"OrderID"})
+		in
+			Unikke
+	lineageTag: 396ee83c-f683-4c5d-9e15-5a342411d36d
+	queryGroup: Silver
+
+	annotation PBI_ResultType = Table
+
+expression slv_order_line =
+		let
+			Ark = Kilde{[Item = "order_line_items", Kind = "Sheet"]}[Data],
+			Headers = Table.PromoteHeaders(Ark, [PromoteAllScalars = true]),
+			Valgt = Table.SelectColumns(Headers, {"LineID", "OrderID", "ProductName", "Quantity", "UnitPrice", "UnitCost", "DiscountPct", "LineTotal"}),
+			Typer = Table.TransformColumnTypes(Valgt, {{"LineID", type text}, {"OrderID", type text}, {"ProductName", type text}, {"Quantity", Int64.Type}, {"UnitPrice", type number}, {"UnitCost", type number}, {"DiscountPct", type number}, {"LineTotal", type number}}, "en-US"),
+			Trimmet = Table.TransformColumns(Typer, {{"LineID", Text.Trim, type text}, {"OrderID", Text.Trim, type text}, {"ProductName", Text.Trim, type text}}),
+			Rabat0 = Table.ReplaceValue(Trimmet, null, 0, Replacer.ReplaceValue, {"DiscountPct"}),
+			Unikke = Table.Distinct(Rabat0, {"LineID"})
+		in
+			Unikke
+	lineageTag: eee4e58f-cab0-4d3b-ac16-b94f95dac7d6
+	queryGroup: Silver
+
+	annotation PBI_ResultType = Table
+
+expression slv_campaign_log =
+		let
+			Ark = Kilde{[Item = "CAMPAIGN_LOG", Kind = "Sheet"]}[Data],
+			Headers = Table.PromoteHeaders(Ark, [PromoteAllScalars = true]),
+			Valgt = Table.SelectColumns(Headers, {"CampaignName", "Channel", "StartDate", "EndDate", "Budget", "Date", "Impressions", "Clicks", "Spend"}),
+			Typer = Table.TransformColumnTypes(Valgt, {{"CampaignName", type text}, {"Channel", type text}, {"StartDate", type date}, {"EndDate", type date}, {"Budget", type number}, {"Date", type date}, {"Impressions", Int64.Type}, {"Clicks", Int64.Type}, {"Spend", type number}}, "en-US"),
+			Trimmet = Table.TransformColumns(Typer, {{"CampaignName", Text.Trim, type text}, {"Channel", Text.Trim, type text}}),
+			Unikke = Table.Distinct(Trimmet, {"CampaignName", "Date"})
+		in
+			Unikke
+	lineageTag: aff72eed-3cda-4492-8539-ccb99e5690df
+	queryGroup: Silver
+
+	annotation PBI_ResultType = Table
+
+expression slv_campaign_sku =
+		let
+			Ark = Kilde{[Item = "campaign_skus", Kind = "Sheet"]}[Data],
+			Headers = Table.PromoteHeaders(Ark, [PromoteAllScalars = true]),
+			Typer = Table.TransformColumnTypes(Headers, {{"CampaignName", type text}, {"PromotedSKUs", type text}}, "en-US"),
+			// En celle med flere SKU'er -> en raekke pr. SKU
+			SomListe = Table.TransformColumns(Typer, {{"PromotedSKUs", each List.Transform(Text.Split(_, ","), Text.Trim)}}),
+			Udfoldet = Table.ExpandListColumn(SomListe, "PromotedSKUs"),
+			Omdoebt = Table.RenameColumns(Udfoldet, {{"PromotedSKUs", "ProductCode"}}),
+			Typer2 = Table.TransformColumnTypes(Omdoebt, {{"ProductCode", type text}}),
+			Trimmet = Table.TransformColumns(Typer2, {{"CampaignName", Text.Trim, type text}}),
+			Unikke = Table.Distinct(Trimmet)
+		in
+			Unikke
+	lineageTag: 5a5e9b43-9c22-4ce2-a404-43178b946103
+	queryGroup: Silver
+
+	annotation PBI_ResultType = Table
+
+expression slv_inventory =
+		let
+			Ark = Kilde{[Item = "inventory", Kind = "Sheet"]}[Data],
+			Headers = Table.PromoteHeaders(Ark, [PromoteAllScalars = true]),
+			// Bredt ark: en kolonne pr. maaned -> en raekke pr. produkt pr. maaned
+			Unpivot = Table.UnpivotOtherColumns(Headers, {"ProductName"}, "Period", "StockQty"),
+			Typer = Table.TransformColumnTypes(Unpivot, {{"ProductName", type text}, {"Period", type text}, {"StockQty", Int64.Type}}, "en-US"),
+			Trimmet = Table.TransformColumns(Typer, {{"ProductName", Text.Trim, type text}, {"Period", Text.Trim, type text}}),
+			MedDato = Table.AddColumn(Trimmet, "MonthStart", each Date.FromText([Period] & "-01", [Format = "yyyy-MM-dd"]), type date),
+			Valgt = Table.SelectColumns(MedDato, {"ProductName", "MonthStart", "StockQty"})
+		in
+			Valgt
+	lineageTag: cb2a3235-8d13-4b82-9034-798917e9c5bb
+	queryGroup: Silver
+
+	annotation PBI_ResultType = Table
+
+expression slv_sales_target =
+		let
+			Ark = Kilde{[Item = "sales_targets", Kind = "Sheet"]}[Data],
+			Headers = Table.PromoteHeaders(Ark, [PromoteAllScalars = true]),
+			Typer = Table.TransformColumnTypes(Headers, {{"Period", type text}, {"TargetRevenue", type number}}, "en-US"),
+			MedDato = Table.AddColumn(Typer, "MonthStart", each Date.FromText(Text.Trim([Period]) & "-01", [Format = "yyyy-MM-dd"]), type date),
+			Valgt = Table.SelectColumns(MedDato, {"MonthStart", "TargetRevenue"}),
+			Unikke = Table.Distinct(Valgt, {"MonthStart"})
+		in
+			Unikke
+	lineageTag: e208f85d-300d-49b7-9731-9118348b24bf
+	queryGroup: Silver
+
+	annotation PBI_ResultType = Table
+
+expression slv_security =
+		let
+			Ark = Kilde{[Item = "security", Kind = "Sheet"]}[Data],
+			Headers = Table.PromoteHeaders(Ark, [PromoteAllScalars = true]),
+			Typer = Table.TransformColumnTypes(Headers, {{"UserEmail", type text}, {"Region", type text}}, "en-US"),
+			Trimmet = Table.TransformColumns(Typer, {{"UserEmail", each Text.Lower(Text.Trim(_)), type text}, {"Region", Text.Trim, type text}}),
+			Unikke = Table.Distinct(Trimmet, {"UserEmail"})
+		in
+			Unikke
+	lineageTag: 79f74ebc-4143-4656-8989-da06429b8daa
+	queryGroup: Silver
+
+	annotation PBI_ResultType = Table
+

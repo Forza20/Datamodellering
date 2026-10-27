@@ -1,0 +1,34 @@
+table dim_channel
+	lineageTag: 3a4a7e22-f238-422a-8b2d-e7b9b65bb931
+
+	column channel_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6cad6202-2769-4148-9cb7-6a65e7f5b5da
+		summarizeBy: none
+		sourceColumn: channel_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel_name
+		dataType: string
+		lineageTag: 9028d0aa-c7f8-47dc-95a8-12cb6b4c45f6
+		summarizeBy: none
+		sourceColumn: channel_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_channel = m
+		mode: import
+		queryGroup: Gold
+		source =
+				let
+					Kanaler = #table(
+						type table [channel_key = Int64.Type, channel_name = text],
+						{{10, "Web"}, {20, "Butik"}, {30, "Telefon"}, {40, "Partner"}, {-1, "Ukendt"}}
+					)
+				in
+					Kanaler
+
+	annotation PBI_ResultType = Table

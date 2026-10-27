@@ -1,0 +1,49 @@
+table fact_inventory
+	lineageTag: 0d6a261f-d8b9-4151-a8d9-b9ee2e369aa8
+
+	column date_key
+		dataType: dateTime
+		isHidden
+		formatString: yyyy-mm-dd
+		lineageTag: b1974252-e6dc-47eb-a3d3-5302a882a4aa
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column product_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2fb7ea04-0957-4cee-97ac-7af5cdd50d0a
+		summarizeBy: none
+		sourceColumn: product_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column stock_qty
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 1e6efd8b-d98f-4bc3-a6c7-94d67b833675
+		summarizeBy: none
+		sourceColumn: stock_qty
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_inventory = m
+		mode: import
+		queryGroup: Gold
+		source =
+				let
+					Produkt = Table.NestedJoin(slv_inventory, {"ProductName"}, dim_product, {"product_name"}, "P", JoinKind.LeftOuter),
+					ProduktUd = Table.ExpandTableColumn(Produkt, "P", {"product_key"}),
+					Ukendt = Table.ReplaceValue(ProduktUd, null, -1, Replacer.ReplaceValue, {"product_key"}),
+					Omdoebt = Table.RenameColumns(Ukendt, {{"MonthStart", "date_key"}, {"StockQty", "stock_qty"}}),
+					Valgt = Table.SelectColumns(Omdoebt, {"date_key", "product_key", "stock_qty"}),
+					Typer = Table.TransformColumnTypes(Valgt, {{"date_key", type date}, {"product_key", Int64.Type}, {"stock_qty", Int64.Type}})
+				in
+					Typer
+
+	annotation PBI_ResultType = Table

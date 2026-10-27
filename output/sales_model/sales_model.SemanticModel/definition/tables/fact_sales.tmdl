@@ -1,0 +1,187 @@
+table fact_sales
+	lineageTag: e5f6668f-c29c-45c6-8389-e9432dedd16e
+
+	column line_id
+		dataType: string
+		lineageTag: f7922197-ff9c-4a14-80eb-72aedf9947c3
+		summarizeBy: none
+		sourceColumn: line_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_id
+		dataType: string
+		lineageTag: c591b242-f368-470b-889f-5dc03ecc3a2e
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: dateTime
+		isHidden
+		formatString: yyyy-mm-dd
+		lineageTag: 90b65e54-758e-4917-9365-aca30af652c8
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column customer_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: bb96d1da-c8dc-4c19-b2aa-b541cd6cb768
+		summarizeBy: none
+		sourceColumn: customer_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9e36b1b8-0195-4f14-805b-f667afafc3e0
+		summarizeBy: none
+		sourceColumn: product_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column channel_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f367bfe8-2e4a-4890-8179-2e3696d96d3e
+		summarizeBy: none
+		sourceColumn: channel_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column region_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7dd2955a-3f74-423c-9f5d-4cfadbd14516
+		summarizeBy: none
+		sourceColumn: region_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_status
+		dataType: string
+		lineageTag: 6ddf8dfb-6344-499b-91b8-56dca1b2c5d4
+		summarizeBy: none
+		sourceColumn: order_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_priority
+		dataType: string
+		lineageTag: 375cd0b4-70f9-40a2-bc15-021602201abc
+		summarizeBy: none
+		sourceColumn: order_priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: caada004-8c17-4943-aadd-f32944c98a8b
+		summarizeBy: none
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column unit_price
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		lineageTag: 8f1cf7cc-45fc-415e-9c51-4a6f7c9e7458
+		summarizeBy: none
+		sourceColumn: unit_price
+
+		annotation SummarizationSetBy = Automatic
+
+	column discount_pct
+		dataType: double
+		isHidden
+		formatString: 0.00
+		lineageTag: 02fa29f6-108f-41d2-96af-8979821ddc9e
+		summarizeBy: none
+		sourceColumn: discount_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column gross_amount
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		lineageTag: 965929cb-7ed9-48ad-ba24-378ce6043b03
+		summarizeBy: none
+		sourceColumn: gross_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column discount_amount
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		lineageTag: 40c23cb1-faa6-4fdf-91d3-cf9aa8178e38
+		summarizeBy: none
+		sourceColumn: discount_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column net_amount
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		lineageTag: b59d95e7-9790-44c6-8ed5-94b96b4b283c
+		summarizeBy: none
+		sourceColumn: net_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column cost_amount
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		lineageTag: ee8ce9d4-ca08-4e2e-a26e-e2d6155d2063
+		summarizeBy: none
+		sourceColumn: cost_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fact_sales = m
+		mode: import
+		queryGroup: Gold
+		source =
+				let
+					Linjer = Table.NestedJoin(slv_order_line, {"OrderID"}, slv_order, {"OrderID"}, "Ordre", JoinKind.Inner),
+					OrdreUd = Table.ExpandTableColumn(Linjer, "Ordre", {"CustomerName", "RegionName", "OrderDate", "OrderChannel", "Status", "Priority"}),
+					Kunde = Table.NestedJoin(OrdreUd, {"CustomerName"}, dim_customer, {"customer_name"}, "K", JoinKind.LeftOuter),
+					KundeUd = Table.ExpandTableColumn(Kunde, "K", {"customer_key"}),
+					Produkt = Table.NestedJoin(KundeUd, {"ProductName"}, dim_product, {"product_name"}, "P", JoinKind.LeftOuter),
+					ProduktUd = Table.ExpandTableColumn(Produkt, "P", {"product_key"}),
+					Region = Table.NestedJoin(ProduktUd, {"RegionName"}, dim_region, {"region_name"}, "R", JoinKind.LeftOuter),
+					RegionUd = Table.ExpandTableColumn(Region, "R", {"region_key"}),
+					Kanal = Table.NestedJoin(RegionUd, {"OrderChannel"}, dim_channel, {"channel_key"}, "Ch", JoinKind.LeftOuter),
+					KanalUd = Table.ExpandTableColumn(Kanal, "Ch", {"channel_key"}),
+					// Ingen match -> -1 (Ukendt)
+					Ukendt = Table.ReplaceValue(KanalUd, null, -1, Replacer.ReplaceValue, {"customer_key", "product_key", "region_key", "channel_key"}),
+					Status = Table.TransformColumns(Ukendt, {{"Status", each if _ = "Delivered" then "Leveret" else if _ = "Shipped" then "Afsendt" else if _ = "Processing" then "Under behandling" else _, type text}}),
+					Prioritet = Table.TransformColumns(Status, {{"Priority", each if _ = "Express" then "Ekspres" else _, type text}}),
+					// LineTotal er brutto (Quantity x UnitPrice) - netto er efter rabat
+					Brutto = Table.AddColumn(Prioritet, "gross_amount", each Number.Round([Quantity] * [UnitPrice], 2), Currency.Type),
+					Netto = Table.AddColumn(Brutto, "net_amount", each Number.Round([gross_amount] * (1 - [DiscountPct]), 2), Currency.Type),
+					Rabat = Table.AddColumn(Netto, "discount_amount", each [gross_amount] - [net_amount], Currency.Type),
+					Kost = Table.AddColumn(Rabat, "cost_amount", each Number.Round([Quantity] * [UnitCost], 2), Currency.Type),
+					Omdoebt = Table.RenameColumns(Kost, {{"LineID", "line_id"}, {"OrderID", "order_id"}, {"OrderDate", "date_key"}, {"Status", "order_status"}, {"Priority", "order_priority"}, {"Quantity", "quantity"}, {"UnitPrice", "unit_price"}, {"DiscountPct", "discount_pct"}}),
+					Valgt = Table.SelectColumns(Omdoebt, {"line_id", "order_id", "date_key", "customer_key", "product_key", "channel_key", "region_key", "order_status", "order_priority", "quantity", "unit_price", "discount_pct", "gross_amount", "discount_amount", "net_amount", "cost_amount"}),
+					Typer = Table.TransformColumnTypes(Valgt, {{"line_id", type text}, {"order_id", type text}, {"date_key", type date}, {"customer_key", Int64.Type}, {"product_key", Int64.Type}, {"channel_key", Int64.Type}, {"region_key", Int64.Type}, {"quantity", Int64.Type}, {"unit_price", Currency.Type}, {"discount_pct", type number}})
+				in
+					Typer
+
+	annotation PBI_ResultType = Table

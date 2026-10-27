@@ -1,0 +1,90 @@
+table dim_product
+	lineageTag: c86d06df-a486-48cb-a016-8a1d90508b30
+
+	column product_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c8da5859-2557-4e1c-8377-d37694dbe285
+		summarizeBy: none
+		sourceColumn: product_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_code
+		dataType: string
+		lineageTag: 47f777f4-0e79-4634-83bb-2cb08827e847
+		summarizeBy: none
+		sourceColumn: product_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name
+		dataType: string
+		lineageTag: c484f444-951b-4921-8e3a-da08cbaec7e3
+		summarizeBy: none
+		sourceColumn: product_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column brand
+		dataType: string
+		lineageTag: f641762b-3bba-436c-979d-69d1357b64ab
+		summarizeBy: none
+		sourceColumn: brand
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: bd129dd0-5128-4c95-8a6d-3614f69d6567
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column subcategory
+		dataType: string
+		lineageTag: b85b4737-27fe-4541-8b9f-21725fb205e4
+		summarizeBy: none
+		sourceColumn: subcategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column list_price
+		dataType: decimal
+		formatString: #,0.00
+		lineageTag: 1609d91d-52fd-49a8-9ef5-f14609058ddf
+		summarizeBy: none
+		sourceColumn: list_price
+
+		annotation SummarizationSetBy = Automatic
+
+	column primary_supplier
+		dataType: string
+		lineageTag: c8669153-4d2f-45b8-83a6-aa6f09022352
+		summarizeBy: none
+		sourceColumn: primary_supplier
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_product = m
+		mode: import
+		queryGroup: Gold
+		source =
+				let
+					MedNoegle = Table.AddColumn(slv_product, "SubLower", each Text.Lower([SubcategoryName]), type text),
+					SubLower = Table.AddColumn(slv_subcategory, "SubLower", each Text.Lower([Subcategory]), type text),
+					Kategori = Table.NestedJoin(MedNoegle, {"SubLower"}, SubLower, {"SubLower"}, "Sub", JoinKind.LeftOuter),
+					KategoriUd = Table.ExpandTableColumn(Kategori, "Sub", {"Category", "Subcategory"}),
+					Sorteret = Table.Buffer(Table.Sort(KategoriUd, {{"ProductCode", Order.Ascending}})),
+					MedKey = Table.AddIndexColumn(Sorteret, "product_key", 1, 1, Int64.Type),
+					Omdoebt = Table.RenameColumns(MedKey, {{"ProductCode", "product_code"}, {"ProductName", "product_name"}, {"Brand", "brand"}, {"Category", "category"}, {"Subcategory", "subcategory"}, {"UnitPrice", "list_price"}, {"PrimarySupplier", "primary_supplier"}}),
+					Valgt = Table.SelectColumns(Omdoebt, {"product_key", "product_code", "product_name", "brand", "category", "subcategory", "list_price", "primary_supplier"}),
+					Typer = Table.TransformColumnTypes(Valgt, {{"product_key", Int64.Type}, {"product_code", type text}, {"product_name", type text}, {"brand", type text}, {"category", type text}, {"subcategory", type text}, {"list_price", Currency.Type}, {"primary_supplier", type text}}),
+					Ukendt = #table(Value.Type(Typer), {{-1, null, "Ukendt", null, "Ukendt", "Ukendt", null, null}}),
+					Samlet = Table.Combine({Typer, Ukendt})
+				in
+					Samlet
+
+	annotation PBI_ResultType = Table

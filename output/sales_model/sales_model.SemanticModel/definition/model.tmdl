@@ -1,0 +1,59 @@
+model Model
+	culture: da-DK
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup Parametre
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup Silver
+
+	annotation PBI_QueryGroupOrder = 1
+
+queryGroup Gold
+
+	annotation PBI_QueryGroupOrder = 2
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["ExcelSti","Kilde","slv_customer","slv_address","slv_city","slv_credit","slv_contact","slv_product","slv_subcategory","slv_order","slv_order_line","slv_campaign_log","slv_campaign_sku","slv_inventory","slv_sales_target","slv_security","dim_date","dim_customer","dim_product","dim_channel","dim_region","dim_campaign","bridge_campaign_product","fact_sales","fact_campaign_spend","fact_inventory","fact_sales_target","security"]
+
+ref table dim_date
+ref table dim_customer
+ref table dim_product
+ref table dim_channel
+ref table dim_region
+ref table dim_campaign
+ref table bridge_campaign_product
+ref table fact_sales
+ref table fact_campaign_spend
+ref table fact_inventory
+ref table fact_sales_target
+ref table security
+ref table _measures
+
+ref expression ExcelSti
+ref expression Kilde
+ref expression slv_customer
+ref expression slv_address
+ref expression slv_city
+ref expression slv_credit
+ref expression slv_contact
+ref expression slv_product
+ref expression slv_subcategory
+ref expression slv_order
+ref expression slv_order_line
+ref expression slv_campaign_log
+ref expression slv_campaign_sku
+ref expression slv_inventory
+ref expression slv_sales_target
+ref expression slv_security
+
+ref role Region
+
+ref cultureInfo da-DK

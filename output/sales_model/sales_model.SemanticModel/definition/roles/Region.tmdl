@@ -1,0 +1,4 @@
+role Region
+	modelPermission: read
+
+	tablePermission dim_region = [region_name] = LOOKUPVALUE(security[region], security[user_email], LOWER(USERPRINCIPALNAME()))

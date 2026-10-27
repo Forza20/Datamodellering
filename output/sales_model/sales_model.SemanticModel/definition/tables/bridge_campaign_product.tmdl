@@ -1,0 +1,41 @@
+table bridge_campaign_product
+	isHidden
+	lineageTag: 2c660401-9c8f-4e81-95cb-b598c1095ebe
+
+	column campaign_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0ab6f841-73fe-4ee6-86e8-98ab731d0fcb
+		summarizeBy: none
+		sourceColumn: campaign_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9c31eb8a-b527-4e74-94c3-7dd22af78b1a
+		summarizeBy: none
+		sourceColumn: product_key
+
+		annotation SummarizationSetBy = Automatic
+
+	partition bridge_campaign_product = m
+		mode: import
+		queryGroup: Gold
+		source =
+				let
+					Kampagne = Table.NestedJoin(slv_campaign_sku, {"CampaignName"}, dim_campaign, {"campaign_name"}, "C", JoinKind.Inner),
+					KampagneUd = Table.ExpandTableColumn(Kampagne, "C", {"campaign_key"}),
+					// Inner join: SKU'er uden produkt (DSC-001) falder ud
+					Produkt = Table.NestedJoin(KampagneUd, {"ProductCode"}, dim_product, {"product_code"}, "P", JoinKind.Inner),
+					ProduktUd = Table.ExpandTableColumn(Produkt, "P", {"product_key"}),
+					Valgt = Table.SelectColumns(ProduktUd, {"campaign_key", "product_key"}),
+					Typer = Table.TransformColumnTypes(Valgt, {{"campaign_key", Int64.Type}, {"product_key", Int64.Type}}),
+					Unikke = Table.Distinct(Typer)
+				in
+					Unikke
+
+	annotation PBI_ResultType = Table
