@@ -1,0 +1,6 @@
+# Zip-filer (indholdet ligger udpakket)
+*.zip
+
+# Power BI lokale filer
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
