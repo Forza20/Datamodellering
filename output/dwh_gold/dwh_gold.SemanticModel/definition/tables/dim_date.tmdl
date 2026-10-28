@@ -1,0 +1,130 @@
+/// Kalendertabel genereret i Power Query. Dækker hele år fra første til sidste dato i fact_sales.
+table dim_date
+	dataCategory: Time
+	lineageTag: 8588ac66-a501-4296-90e1-51352f08dc93
+
+	column date_key
+		dataType: dateTime
+		isKey
+		formatString: yyyy-mm-dd
+		lineageTag: d404a48a-a9af-435c-b0dc-e0a9c2abcea4
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column year
+		dataType: int64
+		formatString: 0
+		displayFolder: År
+		lineageTag: 36cabeb4-b853-49b9-b2e2-228769e14139
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column quarter
+		dataType: string
+		displayFolder: År
+		lineageTag: 9a7b54db-020e-4dab-8d88-670cb36f39a9
+		summarizeBy: none
+		sourceColumn: quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_no
+		dataType: int64
+		isHidden
+		formatString: 0
+		displayFolder: Måned
+		lineageTag: 7ba146e4-6c2e-4dc2-a6f5-ab42ae30ebcf
+		summarizeBy: none
+		sourceColumn: month_no
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_name
+		dataType: string
+		displayFolder: Måned
+		lineageTag: b2ad9a73-1800-413d-9340-c8a72abbb68a
+		summarizeBy: none
+		sourceColumn: month_name
+		sortByColumn: month_no
+
+		annotation SummarizationSetBy = Automatic
+
+	column year_month
+		dataType: string
+		displayFolder: Måned
+		lineageTag: 1ea70f8d-ead9-4f43-914d-20c738cb43b1
+		summarizeBy: none
+		sourceColumn: year_month
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_start
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		displayFolder: Måned
+		lineageTag: 19d69953-280c-403e-962b-db3481dd5aab
+		summarizeBy: none
+		sourceColumn: month_start
+
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column week_no
+		dataType: int64
+		formatString: 0
+		displayFolder: Uge
+		lineageTag: 877c3252-961a-4019-af9a-c0a8e443117c
+		summarizeBy: none
+		sourceColumn: week_no
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_of_week_no
+		dataType: int64
+		isHidden
+		formatString: 0
+		displayFolder: Uge
+		lineageTag: 0ba99e9f-002c-4a60-88da-1662510c6e02
+		summarizeBy: none
+		sourceColumn: day_of_week_no
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_name
+		dataType: string
+		displayFolder: Uge
+		lineageTag: 401b2758-71e4-47bd-bbaa-db104b092558
+		summarizeBy: none
+		sourceColumn: day_name
+		sortByColumn: day_of_week_no
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_date = m
+		mode: import
+		queryGroup: Gold
+		source =
+				let
+					Datoer = List.RemoveNulls(List.Combine({fact_sales[order_date], fact_sales[shipping_date], fact_sales[due_date]})),
+					Start = #date(Date.Year(List.Min(Datoer)), 1, 1),
+					Slut = #date(Date.Year(List.Max(Datoer)), 12, 31),
+					Liste = List.Dates(Start, Duration.Days(Slut - Start) + 1, #duration(1, 0, 0, 0)),
+					Tabel = Table.FromList(Liste, Splitter.SplitByNothing(), type table [date_key = date]),
+					Aar = Table.AddColumn(Tabel, "year", each Date.Year([date_key]), Int64.Type),
+					Kvartal = Table.AddColumn(Aar, "quarter", each "K" & Text.From(Date.QuarterOfYear([date_key])), type text),
+					MaanedNr = Table.AddColumn(Kvartal, "month_no", each Date.Month([date_key]), Int64.Type),
+					Maaned = Table.AddColumn(MaanedNr, "month_name", each Date.ToText([date_key], [Format = "MMM", Culture = "da-DK"]), type text),
+					AarMaaned = Table.AddColumn(Maaned, "year_month", each Date.ToText([date_key], [Format = "yyyy-MM"]), type text),
+					Maanedstart = Table.AddColumn(AarMaaned, "month_start", each Date.StartOfMonth([date_key]), type date),
+					Uge = Table.AddColumn(Maanedstart, "week_no", each Date.WeekOfYear([date_key], Day.Monday), Int64.Type),
+					UgedagNr = Table.AddColumn(Uge, "day_of_week_no", each Date.DayOfWeek([date_key], Day.Monday) + 1, Int64.Type),
+					Ugedag = Table.AddColumn(UgedagNr, "day_name", each Date.ToText([date_key], [Format = "ddd", Culture = "da-DK"]), type text)
+				in
+					Ugedag
+
+	annotation PBI_ResultType = Table

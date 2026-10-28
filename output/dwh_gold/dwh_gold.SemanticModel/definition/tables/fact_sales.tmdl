@@ -1,0 +1,111 @@
+table fact_sales
+	lineageTag: ebe6dffb-8b10-4bd0-9c14-20a3da3f3289
+
+	column order_number
+		dataType: string
+		displayFolder: Ordre
+		lineageTag: 43d20c19-cc7f-445e-a1ad-0c26e0c7e026
+		summarizeBy: none
+		sourceColumn: order_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		displayFolder: Nøgler
+		lineageTag: 61f74ba2-8401-4fa8-b900-71fcf56186df
+		summarizeBy: none
+		sourceColumn: product_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		displayFolder: Nøgler
+		lineageTag: 102f0b77-c1f9-43fd-b168-fd2d2bfda2ae
+		summarizeBy: none
+		sourceColumn: customer_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_date
+		dataType: dateTime
+		isHidden
+		formatString: yyyy-mm-dd
+		displayFolder: Nøgler
+		lineageTag: 54f67846-d48e-4de8-9703-4f7224ee6508
+		summarizeBy: none
+		sourceColumn: order_date
+
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column shipping_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		displayFolder: Datoer
+		lineageTag: a1069f37-a916-4f53-a294-9412b93fa552
+		summarizeBy: none
+		sourceColumn: shipping_date
+
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column due_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		displayFolder: Datoer
+		lineageTag: e9118626-35ae-4515-8162-e51aac1144fc
+		summarizeBy: none
+		sourceColumn: due_date
+
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	column sales_amount
+		dataType: int64
+		formatString: #,##0
+		displayFolder: Beløb
+		lineageTag: 95064db5-9488-42c6-afd5-dd3cafd78ba6
+		summarizeBy: sum
+		sourceColumn: sales_amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column quantity
+		dataType: int64
+		formatString: #,##0
+		displayFolder: Beløb
+		lineageTag: 25a5263a-4119-4390-a0f2-adf18123d1db
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column price
+		dataType: int64
+		formatString: #,##0
+		displayFolder: Beløb
+		lineageTag: 17103988-b640-478c-98a5-c5a04e8efbec
+		summarizeBy: none
+		sourceColumn: price
+
+		annotation SummarizationSetBy = User
+
+	partition fact_sales = m
+		mode: import
+		queryGroup: Gold
+		source =
+				let
+					Kilde = GoldKilde,
+					Data = Kilde{[Schema = "gold", Item = "fact_sales"]}[Data],
+					Valgt = Table.SelectColumns(Data, {"order_number", "product_key", "customer_key", "order_date", "shipping_date", "due_date", "sales_amount", "quantity", "price"}),
+					Typer = Table.TransformColumnTypes(Valgt, {{"order_number", type text}, {"product_key", Int64.Type}, {"customer_key", Int64.Type}, {"order_date", type date}, {"shipping_date", type date}, {"due_date", type date}, {"sales_amount", Int64.Type}, {"quantity", Int64.Type}, {"price", Int64.Type}})
+				in
+					Typer
+
+	annotation PBI_ResultType = Table

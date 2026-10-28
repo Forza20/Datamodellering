@@ -1,0 +1,11 @@
+relationship 7d1093c5-0b40-4fa9-8e45-21ffdc6db511
+	fromColumn: fact_sales.customer_key
+	toColumn: dim_customers.customer_key
+
+relationship 7e55ceaa-2d6c-4946-bd53-76cb24398d9f
+	fromColumn: fact_sales.product_key
+	toColumn: dim_products.product_key
+
+relationship e07b48b9-169a-4905-abac-001e241d6d66
+	fromColumn: fact_sales.order_date
+	toColumn: dim_date.date_key

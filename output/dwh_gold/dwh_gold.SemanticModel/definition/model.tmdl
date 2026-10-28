@@ -1,0 +1,28 @@
+model Model
+	culture: da-DK
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+queryGroup Parametre
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup Gold
+
+	annotation PBI_QueryGroupOrder = 1
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["PgServer","PgDatabase","GoldKilde","dim_customers","dim_products","fact_sales","dim_date"]
+
+ref table dim_customers
+ref table dim_products
+ref table fact_sales
+ref table dim_date
+
+ref expression PgServer
+ref expression PgDatabase
+ref expression GoldKilde

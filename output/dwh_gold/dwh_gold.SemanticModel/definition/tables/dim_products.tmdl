@@ -1,0 +1,124 @@
+table dim_products
+	lineageTag: 51d88a54-e8d3-49ba-b170-cf8afd7797bd
+
+	column product_key
+		dataType: int64
+		isHidden
+		isKey
+		formatString: 0
+		displayFolder: Nøgler
+		lineageTag: 776d4628-93b7-41c8-895f-63c9e0a1fa35
+		summarizeBy: none
+		sourceColumn: product_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: int64
+		isHidden
+		formatString: 0
+		displayFolder: Nøgler
+		lineageTag: e75c6374-fb4d-4b21-8409-de4774274321
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_number
+		dataType: string
+		displayFolder: Produkt
+		lineageTag: 7a88d291-05d8-49d6-9a71-8fcf2d559114
+		summarizeBy: none
+		sourceColumn: product_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name
+		dataType: string
+		displayFolder: Produkt
+		lineageTag: fbe445c7-f6f8-48fb-9398-8b3a784ccbaf
+		summarizeBy: none
+		sourceColumn: product_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_id
+		dataType: string
+		isHidden
+		displayFolder: Nøgler
+		lineageTag: 742e4cea-9174-478d-9cb6-b01daf24cb04
+		summarizeBy: none
+		sourceColumn: category_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		displayFolder: Kategori
+		lineageTag: 073930c2-b505-4bf5-9ad4-ba5242bc41de
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column subcategory
+		dataType: string
+		displayFolder: Kategori
+		lineageTag: aa4cef7f-a1a7-47d5-98e7-7708453baa0a
+		summarizeBy: none
+		sourceColumn: subcategory
+
+		annotation SummarizationSetBy = Automatic
+
+	column maintenance
+		dataType: string
+		displayFolder: Produkt
+		lineageTag: b8a846fc-74c2-4391-b6b1-8fc2d930c1ed
+		summarizeBy: none
+		sourceColumn: maintenance
+
+		annotation SummarizationSetBy = Automatic
+
+	column cost
+		dataType: int64
+		formatString: #,##0
+		displayFolder: Pris
+		lineageTag: 76f1d657-abf8-4505-b7b4-04635f85a393
+		summarizeBy: none
+		sourceColumn: cost
+
+		annotation SummarizationSetBy = User
+
+	column product_line
+		dataType: string
+		displayFolder: Kategori
+		lineageTag: 861176bb-71b8-48ec-8e28-fb43e4c3d09e
+		summarizeBy: none
+		sourceColumn: product_line
+
+		annotation SummarizationSetBy = Automatic
+
+	column start_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		displayFolder: Produkt
+		lineageTag: 99024441-64a0-4ab6-9c80-aac1ce935973
+		summarizeBy: none
+		sourceColumn: start_date
+
+		annotation SummarizationSetBy = Automatic
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition dim_products = m
+		mode: import
+		queryGroup: Gold
+		source =
+				let
+					Kilde = GoldKilde,
+					Data = Kilde{[Schema = "gold", Item = "dim_products"]}[Data],
+					Valgt = Table.SelectColumns(Data, {"product_key", "product_id", "product_number", "product_name", "category_id", "category", "subcategory", "maintenance", "cost", "product_line", "start_date"}),
+					Typer = Table.TransformColumnTypes(Valgt, {{"product_key", Int64.Type}, {"product_id", Int64.Type}, {"product_number", type text}, {"product_name", type text}, {"category_id", type text}, {"category", type text}, {"subcategory", type text}, {"maintenance", type text}, {"cost", Int64.Type}, {"product_line", type text}, {"start_date", type date}})
+				in
+					Typer
+
+	annotation PBI_ResultType = Table

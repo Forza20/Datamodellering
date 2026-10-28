@@ -1,0 +1,69 @@
+// dwh_gold - gold-lag i Supabase (schema gold) + dim_date fra Power BI
+// Indsæt på https://dbdiagram.io/d
+
+Project dwh_gold {
+  database_type: 'PostgreSQL (Supabase)'
+  Note: 'Kilde: github.com/Forza20/sql-data-warehouse-project. Medallion bronze -> silver -> gold.'
+}
+
+// ---------- Dimensioner ----------
+
+Table dim_date {
+  date_key date [pk, note: 'Genereres i Power Query, markeret datotabel']
+  year int
+  quarter varchar
+  month_no int
+  month_name varchar [note: 'Sorteres efter month_no']
+  year_month varchar
+  month_start date
+  week_no int
+  day_of_week_no int
+  day_name varchar [note: 'Sorteres efter day_of_week_no']
+}
+
+Table gold.dim_customers {
+  customer_key integer [pk, note: 'Surrogatnøgle, row_number over customer_id']
+  customer_id integer [unique, note: 'Forretningsnøgle (CRM cst_id)']
+  customer_number text [note: 'CRM cst_key, fx AW00011000']
+  first_name text
+  last_name text
+  country text [note: 'ERP loc_a101']
+  marital_status text
+  gender text [note: 'CRM først, ellers ERP']
+  birthdate date [note: 'ERP cust_az12']
+  create_date date
+}
+
+Table gold.dim_products {
+  product_key integer [pk, note: 'Surrogatnøgle, row_number over start_date, product_number']
+  product_id integer
+  product_number text [unique, note: 'Forretningsnøgle, kobles til sls_prd_key']
+  product_name text
+  category_id text
+  category text
+  subcategory text
+  maintenance text
+  cost integer
+  product_line text
+  start_date date
+  Note: 'Kun aktuelle produkter (prd_end_dt is null)'
+}
+
+// ---------- Fakta ----------
+
+Table gold.fact_sales {
+  order_number text
+  product_key integer
+  customer_key integer
+  order_date date [note: 'NULL ved ugyldig kildedato']
+  shipping_date date
+  due_date date
+  sales_amount integer
+  quantity integer
+  price integer
+  Note: 'Grain: én ordrelinje (ordre x produkt)'
+}
+
+Ref: gold.fact_sales.customer_key > gold.dim_customers.customer_key
+Ref: gold.fact_sales.product_key > gold.dim_products.product_key
+Ref: gold.fact_sales.order_date > dim_date.date_key
