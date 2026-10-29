@@ -49,7 +49,7 @@ Power Query: dim_campaign, dim_product, slv_campaign_sku'''
 
 Table "dim_campaign" [headercolor: #605E5C] {
   "campaign_key" int64 [pk, note: 'Surrogatnøgle for kampagnen, fortløbende nummer genereret i Power Query. · Skjult · Oprindelse: Beregnet i dim_campaign (trin MedKey)']
-  "campaign_name" string [note: 'Kampagnens navn. · Oprindelse: CAMPAIGN_LOG (Sheet).CampaignName · Mulig PII']
+  "campaign_name" string [note: 'Kampagnens navn. · Oprindelse: CAMPAIGN_LOG (Sheet).CampaignName']
   "marketing_channel" string [note: 'Marketingkanal, kampagnen kører i. · Oprindelse: CAMPAIGN_LOG (Sheet).Channel']
   "start_date" dateTime [note: 'Kampagnens startdato. · Oprindelse: CAMPAIGN_LOG (Sheet).StartDate']
   "end_date" dateTime [note: 'Kampagnens slutdato. · Oprindelse: CAMPAIGN_LOG (Sheet).EndDate']
@@ -64,7 +64,7 @@ Power Query: slv_campaign_log'''
 
 Table "dim_channel" [headercolor: #605E5C] {
   "channel_key" int64 [pk, note: 'Kanalnøgle (10 Web, 20 Butik, 30 Telefon, 40 Partner, -1 Ukendt). · Skjult · Oprindelse: Beregnet i dim_channel (trin Kanaler)']
-  "channel_name" string [note: 'Salgskanalens navn. · Oprindelse: Beregnet i dim_channel (trin Kanaler) · Mulig PII']
+  "channel_name" string [note: 'Salgskanalens navn. · Oprindelse: Beregnet i dim_channel (trin Kanaler)']
 
   Note: '''Salgskanaler som fast liste i Power Query: Web, Butik, Telefon, Partner og Ukendt.
 Type: Dimension'''
@@ -78,10 +78,10 @@ Table "dim_customer" [headercolor: #605E5C] {
   "account_manager" string [note: 'Ansvarlig account manager for kunden. · Oprindelse: CUST_MASTER (Sheet).AccountManager · Mulig PII']
   "payment_terms" string [note: 'Kundens betalingsbetingelser. · Oprindelse: CUST_MASTER (Sheet).PaymentTerms']
   "credit_limit" decimal [note: 'Kundens kreditgrænse i kroner. · Oprindelse: user_details (Sheet).CreditLimit']
-  "street" string [note: 'Kundens gadeadresse. · Oprindelse: Address (Sheet).Street']
+  "street" string [note: 'Kundens gadeadresse. · Oprindelse: Address (Sheet).Street · Mulig PII']
   "city" string [note: 'Kundens by. · Oprindelse: Address (Sheet).CityName · Mulig PII']
   "region" string [note: 'Region for kundens by. · Oprindelse: cities (Sheet).RegionName']
-  "primary_contact" string [note: 'Kundens primære kontaktperson. · Oprindelse: customer_contacts (Sheet).ContactName']
+  "primary_contact" string [note: 'Kundens primære kontaktperson. · Oprindelse: customer_contacts (Sheet).ContactName · Mulig PII']
 
   Note: '''Kundedimension samlet fra kundestamdata, adresse, by, kreditgrænse og kontaktperson. Har en Ukendt-række med nøgle -1.
 Type: Dimension
@@ -95,7 +95,7 @@ Table "dim_date" [headercolor: #252423] {
   "year" int64 [note: 'Kalenderår. · Oprindelse: Beregnet i dim_date (trin Aar)']
   "quarter" string [note: 'Kvartal som tekst, fx K1–K4. · Oprindelse: Beregnet i dim_date (trin Kvartal)']
   "month_no" int64 [note: 'Månedsnummer 1–12. Bruges til sortering af månedsnavne. · Skjult · Oprindelse: Beregnet i dim_date (trin MaanedNr)']
-  "month_name" string [note: 'Forkortet dansk månedsnavn. · Oprindelse: Beregnet i dim_date (trin Maaned) · Mulig PII']
+  "month_name" string [note: 'Forkortet dansk månedsnavn. · Oprindelse: Beregnet i dim_date (trin Maaned)']
   "year_month" string [note: 'År og måned som tekst i formatet yyyy-MM. · Oprindelse: Beregnet i dim_date (trin AarMaaned)']
   "month_start" dateTime [note: 'Første dag i måneden. · Oprindelse: Beregnet i dim_date (trin Maanedstart)']
   "week_no" int64 [note: 'Ugenummer med mandag som første ugedag. · Oprindelse: Beregnet i dim_date (trin Uge)']
@@ -109,7 +109,7 @@ Power Query: slv_campaign_log, slv_inventory, slv_order, slv_sales_target'''
 Table "dim_product" [headercolor: #605E5C] {
   "product_key" int64 [pk, note: 'Surrogatnøgle for produktet, fortløbende nummer genereret i Power Query. -1 = Ukendt. · Skjult · Oprindelse: Beregnet i dim_product (trin MedKey)']
   "product_code" string [note: 'Produktkode fra produktarket (forretningsnøgle). · Oprindelse: products (Sheet).ProductCode']
-  "product_name" string [note: 'Produktnavn. · Oprindelse: products (Sheet).ProductName · Mulig PII']
+  "product_name" string [note: 'Produktnavn. · Oprindelse: products (Sheet).ProductName']
   "brand" string [note: 'Produktets brand. · Oprindelse: products (Sheet).Brand']
   "category" string [note: 'Produktkategori, slået op via underkategorien (match uden forskel på store og små bogstaver). · Oprindelse: subcategories (Sheet).CategorySubcategory']
   "subcategory" string [note: 'Produktets underkategori. · Oprindelse: subcategories (Sheet).CategorySubcategory']
@@ -125,7 +125,7 @@ Power Query: slv_product, slv_subcategory'''
 
 Table "dim_region" [headercolor: #605E5C] {
   "region_key" int64 [pk, note: 'Surrogatnøgle for regionen, fortløbende nummer genereret i Power Query. -1 = Ukendt. · Skjult · Oprindelse: Beregnet i dim_region (trin MedKey)']
-  "region_name" string [note: 'Regionens navn. Bruges også til rækkesikkerhed (RLS) via security-tabellen. · Oprindelse: cities (Sheet).RegionName · Mulig PII']
+  "region_name" string [note: 'Regionens navn. Bruges også til rækkesikkerhed (RLS) via security-tabellen. · Oprindelse: cities (Sheet).RegionName']
 
   Note: '''Regionsdimension ud fra bylisten. Har en Ukendt-række med nøgle -1.
 Type: Dimension

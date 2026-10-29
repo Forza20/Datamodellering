@@ -1,6 +1,6 @@
 # Data lineage – sales_model
 
-Genereret 2026-10-29 20:08 af pbip-catalog. Farver: sort = datakilde, grå = Power Query, mørk = tabel, hvid = kolonne, turkis = measure, rosa = dashboard.
+Genereret 2026-10-29 20:32 af pbip-catalog. Farver: sort = datakilde, grå = Power Query, mørk = tabel, hvid = kolonne, turkis = measure, rosa = dashboard.
 
 ## Overblik (tabelniveau)
 
