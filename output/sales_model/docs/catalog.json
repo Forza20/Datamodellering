@@ -1,6 +1,6 @@
 {
   "project": "sales_model",
-  "generated": "2026-10-29T20:03:38",
+  "generated": "2026-10-29T20:08:25",
   "slotsSource": "ingen pbip-layout-side fundet",
   "tables": [
     {
@@ -19,7 +19,7 @@
       "Beskrivelse": "Samlet measure-tabel for salgsmodellen. Indeholder kun measures; kolonnen er en skjult pladsholder.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Ingen – measure-tabel i Power BI",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -39,7 +39,7 @@
       "Beskrivelse": "Skjult brotabel, der kobler kampagner og produkter (mange-til-mange).",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › campaign_skus (CampaignName, PromotedSKUs) matchet mod dim_campaign og dim_product",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -59,7 +59,7 @@
       "Beskrivelse": "Kampagnedimension med én række pr. kampagne fra CAMPAIGN_LOG-arket.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CAMPAIGN_LOG",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -79,7 +79,7 @@
       "Beskrivelse": "Salgskanaler som fast liste i Power Query: Web, Butik, Telefon, Partner og Ukendt.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Fast liste i Power Query – ingen kilde i silver",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -99,7 +99,7 @@
       "Beskrivelse": "Kundedimension samlet fra kundestamdata, adresse, by, kreditgrænse og kontaktperson. Har en Ukendt-række med nøgle -1.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › Address, CUST_MASTER, cities, customer_contacts, user_details",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -119,7 +119,7 @@
       "Beskrivelse": "Kalendertabel genereret i Power Query, én række pr. dag.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Genereres i Power Query ud fra datoerne i ordrer, kampagner, lager og salgsmål",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -131,7 +131,7 @@
       "Kolonner": 8,
       "Measures": 0,
       "Kilde": "Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx",
-      "Kildeobjekter": "products (Sheet)",
+      "Kildeobjekter": "products (Sheet), subcategories (Sheet)",
       "Opstrøms queries": "slv_product, slv_subcategory",
       "Query-gruppe": "Gold",
       "Lagring": "import",
@@ -139,7 +139,7 @@
       "Beskrivelse": "Produktdimension med kategori og underkategori. Har en Ukendt-række med nøgle -1.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › products, subcategories",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -159,7 +159,7 @@
       "Beskrivelse": "Regionsdimension ud fra bylisten. Har en Ukendt-række med nøgle -1.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › cities",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -179,7 +179,7 @@
       "Beskrivelse": "Kampagneforbrug pr. kampagne pr. dag: visninger, klik og forbrug.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CAMPAIGN_LOG",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -199,7 +199,7 @@
       "Beskrivelse": "Lagerbeholdning pr. produkt pr. måned. Arket har én kolonne pr. måned og er unpivoteret i Power Query.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › inventory",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -219,7 +219,7 @@
       "Beskrivelse": "Salgsfakta med én række pr. ordrelinje: ordre, kunde, produkt, kanal, region, status samt brutto, rabat, netto og kostpris.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › ORDERS_2025 + ORDERS_2026 (ordrehoved) og order_line_items (linjer)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -239,7 +239,7 @@
       "Beskrivelse": "Månedlige salgsmål fra sales_targets-arket, én række pr. måned.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › sales_targets",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -259,7 +259,7 @@
       "Beskrivelse": "Skjult tabel til rækkesikkerhed (RLS): kobler brugerens e-mail til den region, brugeren må se.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › security",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     }
@@ -285,7 +285,7 @@
       "Beskrivelse": "Nøgle til dim_campaign.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Opslag af dim_campaign[campaign_key] (surrogatnøgle genereret i Power Query)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -309,7 +309,7 @@
       "Beskrivelse": "Nøgle til dim_product.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Opslag af dim_product[product_key] (surrogatnøgle genereret i Power Query)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -333,7 +333,7 @@
       "Beskrivelse": "Surrogatnøgle for kampagnen, fortløbende nummer genereret i Power Query.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Surrogatnøgle genereret i Power Query (fortløbende, -1 = Ukendt)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -357,7 +357,7 @@
       "Beskrivelse": "Kampagnens navn.",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CAMPAIGN_LOG › CampaignName",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -381,7 +381,7 @@
       "Beskrivelse": "Marketingkanal, kampagnen kører i.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CAMPAIGN_LOG › Channel",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -405,7 +405,7 @@
       "Beskrivelse": "Kampagnens startdato.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CAMPAIGN_LOG › StartDate",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -429,7 +429,7 @@
       "Beskrivelse": "Kampagnens slutdato.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CAMPAIGN_LOG › EndDate",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -453,7 +453,7 @@
       "Beskrivelse": "Kampagnens samlede budget i kroner.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CAMPAIGN_LOG › Budget",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -477,7 +477,7 @@
       "Beskrivelse": "Kanalnøgle (10 Web, 20 Butik, 30 Telefon, 40 Partner, -1 Ukendt).",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Fast liste i Power Query (dim_channel) – ingen kilde i silver",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -501,7 +501,7 @@
       "Beskrivelse": "Salgskanalens navn.",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Fast liste i Power Query (dim_channel) – ingen kilde i silver",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -525,7 +525,7 @@
       "Beskrivelse": "Surrogatnøgle for kunden, fortløbende nummer genereret i Power Query. -1 = Ukendt.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Surrogatnøgle genereret i Power Query (fortløbende, -1 = Ukendt)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -549,7 +549,7 @@
       "Beskrivelse": "Kundens id i kundestamdata (CUST_MASTER).",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CUST_MASTER › CustomerID",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -573,7 +573,7 @@
       "Beskrivelse": "Kundens navn.",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CUST_MASTER › CustomerName",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -597,7 +597,7 @@
       "Beskrivelse": "Kundesegment.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CUST_MASTER › Segment",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -621,7 +621,7 @@
       "Beskrivelse": "Ansvarlig account manager for kunden.",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CUST_MASTER › AccountManager",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -645,7 +645,7 @@
       "Beskrivelse": "Kundens betalingsbetingelser.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CUST_MASTER › PaymentTerms",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -669,7 +669,7 @@
       "Beskrivelse": "Kundens kreditgrænse i kroner.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › user_details › CreditLimit",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -693,7 +693,7 @@
       "Beskrivelse": "Kundens gadeadresse.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › Address › Street",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -717,7 +717,7 @@
       "Beskrivelse": "Kundens by.",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › Address › CityName",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -741,7 +741,7 @@
       "Beskrivelse": "Region for kundens by.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › cities › RegionName",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -765,7 +765,7 @@
       "Beskrivelse": "Kundens primære kontaktperson.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › customer_contacts › ContactName",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -789,7 +789,7 @@
       "Beskrivelse": "Dato (én række pr. dag). Nøgle til faktatabellerne.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Genereres i Power Query (dim_date)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -813,7 +813,7 @@
       "Beskrivelse": "Kalenderår.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Genereres i Power Query (dim_date)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -837,7 +837,7 @@
       "Beskrivelse": "Kvartal som tekst, fx K1–K4.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Genereres i Power Query (dim_date)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -861,7 +861,7 @@
       "Beskrivelse": "Månedsnummer 1–12. Bruges til sortering af månedsnavne.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Genereres i Power Query (dim_date)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -885,7 +885,7 @@
       "Beskrivelse": "Forkortet dansk månedsnavn.",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Genereres i Power Query (dim_date)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -909,7 +909,7 @@
       "Beskrivelse": "År og måned som tekst i formatet yyyy-MM.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Genereres i Power Query (dim_date)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -933,7 +933,7 @@
       "Beskrivelse": "Første dag i måneden.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Genereres i Power Query (dim_date)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -957,7 +957,7 @@
       "Beskrivelse": "Ugenummer med mandag som første ugedag.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Genereres i Power Query (dim_date)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -981,7 +981,7 @@
       "Beskrivelse": "Surrogatnøgle for produktet, fortløbende nummer genereret i Power Query. -1 = Ukendt.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Surrogatnøgle genereret i Power Query (fortløbende, -1 = Ukendt)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1005,7 +1005,7 @@
       "Beskrivelse": "Produktkode fra produktarket (forretningsnøgle).",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › products › ProductCode",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1029,7 +1029,7 @@
       "Beskrivelse": "Produktnavn.",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › products › ProductName",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1053,7 +1053,7 @@
       "Beskrivelse": "Produktets brand.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › products › Brand",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1067,9 +1067,9 @@
       "Nøglefelt": "",
       "Beregnet": "",
       "Mulig PII": "",
-      "Oprindelse": "SubLower[Category]",
-      "Kilde": "",
-      "Power Query-trin": "dim_product: Hentet via join (SubLower[Category]) → dim_product: Omdøbt (Category → category) → dim_product: Samlet (append) (Typer, Ukendt)",
+      "Oprindelse": "subcategories (Sheet).CategorySubcategory",
+      "Kilde": "Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx",
+      "Power Query-trin": "slv_subcategory: Navigation (subcategories (Sheet)) → slv_subcategory: Opdelt (CategorySubcategory → Category (skilletegn \"|\")) → slv_subcategory: Transformeret ({\"Category\", each Text.Proper(Text.Trim(_)), type text}) → dim_product: Hentet via join (SubLower[Category]) → dim_product: Omdøbt (Category → category) → dim_product: Samlet (append) (Typer, Ukendt)",
       "DAX": "",
       "Dashboard-plads": "",
       "Dashboard (indirekte)": "",
@@ -1077,7 +1077,7 @@
       "Beskrivelse": "Produktkategori, slået op via underkategorien (match uden forskel på store og små bogstaver).",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › subcategories › CategorySubcategory (delen før \"|\"), matchet på underkategori",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1091,9 +1091,9 @@
       "Nøglefelt": "",
       "Beregnet": "",
       "Mulig PII": "",
-      "Oprindelse": "SubLower[Subcategory]",
-      "Kilde": "",
-      "Power Query-trin": "dim_product: Hentet via join (SubLower[Subcategory]) → dim_product: Omdøbt (Subcategory → subcategory) → dim_product: Samlet (append) (Typer, Ukendt)",
+      "Oprindelse": "subcategories (Sheet).CategorySubcategory",
+      "Kilde": "Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx",
+      "Power Query-trin": "slv_subcategory: Navigation (subcategories (Sheet)) → slv_subcategory: Opdelt (CategorySubcategory → Subcategory (skilletegn \"|\")) → slv_subcategory: Transformeret ({\"Subcategory\", each Text.Proper(Text.Trim(_)), type text}) → dim_product: Hentet via join (SubLower[Subcategory]) → dim_product: Omdøbt (Subcategory → subcategory) → dim_product: Samlet (append) (Typer, Ukendt)",
       "DAX": "",
       "Dashboard-plads": "",
       "Dashboard (indirekte)": "",
@@ -1101,7 +1101,7 @@
       "Beskrivelse": "Produktets underkategori.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › subcategories › CategorySubcategory (delen efter \"|\"); produkter matches via products › SubcategoryName",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1125,7 +1125,7 @@
       "Beskrivelse": "Listepris pr. stk.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › products › UnitPrice",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1149,7 +1149,7 @@
       "Beskrivelse": "Produktets primære leverandør.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › products › PrimarySupplier",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1173,7 +1173,7 @@
       "Beskrivelse": "Surrogatnøgle for regionen, fortløbende nummer genereret i Power Query. -1 = Ukendt.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Surrogatnøgle genereret i Power Query (fortløbende, -1 = Ukendt)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1197,7 +1197,7 @@
       "Beskrivelse": "Regionens navn. Bruges også til rækkesikkerhed (RLS) via security-tabellen.",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › cities › RegionName",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1221,7 +1221,7 @@
       "Beskrivelse": "Dato for forbruget. Relation til dim_date.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CAMPAIGN_LOG › Date",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1245,7 +1245,7 @@
       "Beskrivelse": "Nøgle til dim_campaign.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Opslag af dim_campaign[campaign_key] (surrogatnøgle genereret i Power Query)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1269,7 +1269,7 @@
       "Beskrivelse": "Antal visninger.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CAMPAIGN_LOG › Impressions",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1293,7 +1293,7 @@
       "Beskrivelse": "Antal klik.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CAMPAIGN_LOG › Clicks",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1317,7 +1317,7 @@
       "Beskrivelse": "Forbrug i kroner.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › CAMPAIGN_LOG › Spend",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1341,7 +1341,7 @@
       "Beskrivelse": "Første dag i måneden for lagerbeholdningen. Relation til dim_date.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › inventory › kolonneoverskrifterne (yyyy-MM) efter unpivot, som første dag i måneden",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1365,7 +1365,7 @@
       "Beskrivelse": "Nøgle til dim_product.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Opslag af dim_product[product_key] (surrogatnøgle genereret i Power Query)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1379,9 +1379,9 @@
       "Nøglefelt": "",
       "Beregnet": "",
       "Mulig PII": "",
-      "Oprindelse": "inventory (Sheet).StockQty",
+      "Oprindelse": "inventory (Sheet).(alle kolonner undtagen ProductName)",
       "Kilde": "Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx",
-      "Power Query-trin": "slv_inventory: Navigation (inventory (Sheet)) → fact_inventory: Omdøbt (StockQty → stock_qty)",
+      "Power Query-trin": "slv_inventory: Navigation (inventory (Sheet)) → slv_inventory: Unpivot (StockQty = værdier fra alle kolonner undtagen ProductName) → fact_inventory: Omdøbt (StockQty → stock_qty)",
       "DAX": "",
       "Dashboard-plads": "",
       "Dashboard (indirekte)": "",
@@ -1389,7 +1389,7 @@
       "Beskrivelse": "Lagerbeholdning i stk. ved månedens opgørelse. Må ikke summeres over tid.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › inventory › værdierne i månedskolonnerne (unpivot, alle kolonner undtagen ProductName)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1413,7 +1413,7 @@
       "Beskrivelse": "Ordrelinjens id.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › order_line_items › LineID",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1437,7 +1437,7 @@
       "Beskrivelse": "Ordrens id. Flere linjer kan have samme ordre.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › order_line_items › OrderID",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1461,7 +1461,7 @@
       "Beskrivelse": "Ordredato. Relation til dim_date.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › ORDERS_2025 + ORDERS_2026 › OrderDate (dato uden klokkeslæt)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1485,7 +1485,7 @@
       "Beskrivelse": "Nøgle til dim_customer. -1 hvis kunden ikke findes.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Opslag af dim_customer[customer_key] (surrogatnøgle genereret i Power Query)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1509,7 +1509,7 @@
       "Beskrivelse": "Nøgle til dim_product. -1 hvis produktet ikke findes.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Opslag af dim_product[product_key] (surrogatnøgle genereret i Power Query)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1533,7 +1533,7 @@
       "Beskrivelse": "Nøgle til dim_channel. -1 hvis kanalen ikke findes.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › ORDERS_2025/ORDERS_2026 › OrderChannel, matchet mod dim_channel (ukendt → -1)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1557,7 +1557,7 @@
       "Beskrivelse": "Nøgle til dim_region. -1 hvis regionen ikke findes.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Opslag af dim_region[region_key] (surrogatnøgle genereret i Power Query)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1581,7 +1581,7 @@
       "Beskrivelse": "Ordrestatus på dansk: Leveret, Afsendt eller Under behandling.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › ORDERS_2025 + ORDERS_2026 › Status (oversat til dansk)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1605,7 +1605,7 @@
       "Beskrivelse": "Ordreprioritet, fx Ekspres.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › ORDERS_2025 + ORDERS_2026 › Priority (Express → Ekspres)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1629,7 +1629,7 @@
       "Beskrivelse": "Antal enheder på ordrelinjen.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › order_line_items › Quantity",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1653,7 +1653,7 @@
       "Beskrivelse": "Enhedspris før rabat.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › order_line_items › UnitPrice",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1677,7 +1677,7 @@
       "Beskrivelse": "Rabat i procent på ordrelinjen (0 hvis tom).",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › order_line_items › DiscountPct",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1701,7 +1701,7 @@
       "Beskrivelse": "Bruttobeløb: antal × enhedspris, afrundet til 2 decimaler.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Beregnet i Power Query: Quantity × UnitPrice fra data/silver/Silver_Excel.xlsx › order_line_items",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1725,7 +1725,7 @@
       "Beskrivelse": "Rabatbeløb: bruttobeløb minus nettobeløb.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Beregnet i Power Query: gross_amount − net_amount",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1749,7 +1749,7 @@
       "Beskrivelse": "Nettobeløb efter rabat: bruttobeløb × (1 − rabat %), afrundet til 2 decimaler.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Beregnet i Power Query: gross_amount × (1 − DiscountPct) fra data/silver/Silver_Excel.xlsx › order_line_items",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1773,7 +1773,7 @@
       "Beskrivelse": "Kostpris for ordrelinjen: antal × enhedskost, afrundet til 2 decimaler.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Beregnet i Power Query: Quantity × UnitCost fra data/silver/Silver_Excel.xlsx › order_line_items",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1797,7 +1797,7 @@
       "Beskrivelse": "Første dag i måneden for salgsmålet. Relation til dim_date.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › sales_targets › Period (yyyy-MM) som første dag i måneden",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1821,7 +1821,7 @@
       "Beskrivelse": "Salgsmål for måneden i kroner.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › sales_targets › TargetRevenue",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1845,7 +1845,7 @@
       "Beskrivelse": "Brugerens e-mail i små bogstaver. Matches mod USERPRINCIPALNAME() i rollen Region.",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › security › UserEmail (små bogstaver, trimmet)",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
@@ -1869,7 +1869,7 @@
       "Beskrivelse": "Region, brugeren har adgang til.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "data/silver/Silver_Excel.xlsx › security › Region",
       "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     }
