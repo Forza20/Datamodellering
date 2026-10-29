@@ -1,0 +1,151 @@
+// Genereret af pbip-catalog 2026-10-29 – rediger beskrivelser i catalog.xlsx
+Project "dwh_gold" {
+  database_type: 'Power BI'
+  Note: '''Power BI semantisk model "dwh_gold". Tabeller, kolonner og measures med beskrivelser, oprindelse og dashboard-pladser i noterne.'''
+}
+
+Table "_Measures" [headercolor: #1FC8C0] {
+  "Omsætning" measure [note: 'Sum af salgsbeløb. · DAX: SUM ( fact_sales[sales_amount] ) · Dashboard: KPI 1 (Værdi); Trend (Værdi); Månedskort 1 (Værdi); Top 10-tabel (Værdi)']
+  "Antal ordrer" measure [note: 'Antal unikke ordrer (distinkte ordrenumre) i den aktuelle filterkontekst. Hovedtal på KPI 2, Månedskort 2, kategorisøjlerne og top 10-tabellen. · DAX: DISTINCTCOUNT ( fact_sales[order_number] ) · Dashboard: KPI 2 (Værdi); Månedskort 2 (Værdi); Søjler pr. kategori (Værdi); Søjler pr. kategori (Sortering); Top 10-tabel (Værdi); Top 10-tabel (Sortering)']
+  "Antal ordrelinjer" measure [note: 'Antal ordrelinjer, dvs. rækker i fact_sales. En ordre kan have flere linjer. · DAX: COUNTROWS ( fact_sales )']
+  "Antal enheder" measure [note: 'Samlet antal solgte enheder (sum af quantity). · DAX: SUM ( fact_sales[quantity] )']
+  "Gns. ordrelinje" measure [note: 'Gennemsnitlig omsætning pr. ordrelinje: Omsætning divideret med antal ordrelinjer. · DAX: DIVIDE ( [Omsætning], [Antal ordrelinjer] )']
+  "Gns. ordreværdi" measure [note: 'Gennemsnitlig ordreværdi: Omsætning divideret med antal unikke ordrer. · DAX: DIVIDE ( [Omsætning], [Antal ordrer] )']
+  "Antal kunder" measure [note: 'Kunder med salg i den aktuelle filterkontekst. · DAX: DISTINCTCOUNT ( fact_sales[customer_key] ) · Dashboard: Månedskort 3 (Værdi)']
+  "Omsætning pr. kunde" measure [note: 'Gennemsnitlig omsætning pr. kunde med salg i perioden: Omsætning divideret med antal kunder. · DAX: DIVIDE ( [Omsætning], [Antal kunder] )']
+  "Omsætning YTD" measure [note: 'Omsætning år-til-dato, akkumuleret fra 1. januar til den sidste dato i filterkonteksten. · DAX: TOTALYTD ( [Omsætning], dim_date[date_key] )']
+  "Omsætning sidste år" measure [note: 'Omsætning i samme periode året før (SAMEPERIODLASTYEAR på dim_date). · DAX: CALCULATE ( [Omsætning], SAMEPERIODLASTYEAR ( dim_date[date_key] ) )']
+  "Omsætning YoY" measure [note: 'Ændring i omsætning i forhold til samme periode sidste år, i kroner. Blank hvis et af årene mangler data. · DAX: VAR _aar = [Omsætning] VAR _sidsteAar = [Omsætning sidste år] RETURN IF ( NOT ISBLANK ( _aar ) && NOT ISBLANK ( _sidsteAar ), _aar - _sidsteAar )']
+  "Omsætning YoY %" measure [note: 'Procentvis ændring i omsætning i forhold til samme periode sidste år. · DAX: VAR _sidsteAar = [Omsætning sidste år] RETURN DIVIDE ( [Omsætning] - _sidsteAar, _sidsteAar )']
+  "Omsætning YTD sidste år" measure [note: 'Omsætning år-til-dato for samme periode året før. · DAX: CALCULATE ( [Omsætning YTD], SAMEPERIODLASTYEAR ( dim_date[date_key] ) )']
+  "Omsætning YTD YoY %" measure [note: 'Procentvis ændring i omsætning år-til-dato i forhold til samme periode sidste år. · DAX: VAR _ytd = [Omsætning YTD] VAR _ytdSidsteAar = [Omsætning YTD sidste år] RETURN DIVIDE ( _ytd - _ytdSidsteAar, _ytdSidsteAar )']
+  "Produktrang" measure [note: 'Rang efter omsætning blandt de valgte produkter. Brug som visualfilter (<= 10). · DAX: IF ( ISINSCOPE ( dim_products[product_name] ), RANKX ( ALLSELECTED ( dim_products[product_name] ), [Omsætning], , DESC, DENSE ) )']
+  "Omsætning top 10 produkter" measure [note: 'Omsætning begrænset til de 10 produkter med højest omsætning blandt de valgte produkter. · DAX: VAR _top = TOPN ( 10, ALLSELECTED ( dim_products[product_name] ), [Omsætning], DESC ) RETURN CALCULATE ( [Omsætning], KEEPFILTERS ( _top ) )']
+  "Omsætning bund 10 produkter" measure [note: 'Udelader produkter uden salg, ellers ville de fylde hele listen. · DAX: VAR _medSalg = FILTER ( ALLSELECTED ( dim_products[product_name] ), NOT ISBLANK ( [Omsætning] ) ) VAR _bund = TOPN ( 10, _medSalg, [Omsætning], ASC ) RETURN CALCULATE ( [Omsætning], KEEPFILTERS ( _bund ) )']
+  "Omsætning efter afsendelsesdato" measure [note: 'Omsætning fordelt efter afsendelsesdato (inaktiv relation til dim_date). · DAX: CALCULATE ( [Omsætning], USERELATIONSHIP ( fact_sales[shipping_date], dim_date[date_key] ) )']
+  "Omsætning efter forfaldsdato" measure [note: 'Omsætning fordelt efter forfaldsdato (inaktiv relation til dim_date). · DAX: CALCULATE ( [Omsætning], USERELATIONSHIP ( fact_sales[due_date], dim_date[date_key] ) )']
+  "Kostpris" measure [note: 'Kostpris = antal × kostpris pr. stk. fra dim_products. · DAX: SUMX ( fact_sales, fact_sales[quantity] * RELATED ( dim_products[cost] ) ) · Bruges indirekte i: KPI 3, KPI 4, Top 10-tabel']
+  "Dækningsbidrag" measure [note: 'Omsætning minus kostpris (antal × kostpris pr. stk.). Vises på KPI 3. · DAX: [Omsætning] - [Kostpris] · Dashboard: KPI 3 (Værdi)']
+  "Margin %" measure [note: 'Dækningsbidrag i procent af omsætningen. Vises på KPI 4 og som farvegradient i top 10-tabellen. · DAX: DIVIDE ( [Dækningsbidrag], [Omsætning] ) · Dashboard: KPI 4 (Værdi); Top 10-tabel (Værdi); Top 10-tabel (Formatering)']
+  "Seneste hele måned slut" measure [note: 'Sidste dag i seneste HELE måned med salg. Data slutter midt i en måned, så den delvise måned springes over. · DAX: VAR _max = CALCULATE ( MAX ( fact_sales[order_date] ), REMOVEFILTERS ( dim_date ) ) RETURN IF ( _max = EOMONTH ( _max, 0 ), _max, EOMONTH ( _max, -1 ) ) · Bruges indirekte i: Månedskort 1, Månedskort 2, Månedskort 3']
+  "Omsætning seneste måned" measure [note: 'Omsætning i seneste hele måned med salg (delvis måned springes over), uanset datofilter. Vises på Månedskort 1. · DAX: VAR _slut = [Seneste hele måned slut] RETURN CALCULATE ( [Omsætning], REMOVEFILTERS ( dim_date ), dim_date[date_key] > EOMONTH ( _slut, -1 ), dim_date[date_key] <= _slut ) · Dashboard: Månedskort 1 (Værdi)']
+  "Omsætning forrige måned" measure [note: 'Omsætning i måneden før seneste hele måned. Bruges til sammenligning på Månedskort 1. · DAX: VAR _slut = [Seneste hele måned slut] RETURN CALCULATE ( [Omsætning], REMOVEFILTERS ( dim_date ), dim_date[date_key] > EOMONTH ( _slut, -2 ), dim_date[date_key] <= EOMONTH ( _slut, -1 ) ) · Bruges indirekte i: Månedskort 1']
+  "Omsætning måned label" measure [note: 'Tekst til Månedskort 1: forrige måneds omsætning og procentvis ændring til seneste hele måned. · DAX: VAR _cm = [Omsætning seneste måned] VAR _pm = [Omsætning forrige måned] RETURN "Forrige måned: " & FORMAT ( _pm, "#,0" ) & " (" & FORMAT ( DIVIDE ( _cm - _pm, _pm ), "+0.0%;-0.0%;0.0%" ) & ")" · Dashboard: Månedskort 1 (Værdi)']
+  "Omsætning måned farve" measure [note: 'Farvekode til Månedskort 1: rød (#D64550) hvis omsætningen faldt fra forrige måned, ellers mørk tekstfarve. · DAX: IF ( [Omsætning seneste måned] < [Omsætning forrige måned], "#D64550", "#252423" ) · Dashboard: Månedskort 1 (Formatering)']
+  "Ordrer seneste måned" measure [note: 'Antal unikke ordrer i seneste hele måned med salg, uanset datofilter. Vises på Månedskort 2. · DAX: VAR _slut = [Seneste hele måned slut] RETURN CALCULATE ( [Antal ordrer], REMOVEFILTERS ( dim_date ), dim_date[date_key] > EOMONTH ( _slut, -1 ), dim_date[date_key] <= _slut ) · Dashboard: Månedskort 2 (Værdi)']
+  "Ordrer forrige måned" measure [note: 'Antal unikke ordrer i måneden før seneste hele måned. Bruges til sammenligning på Månedskort 2. · DAX: VAR _slut = [Seneste hele måned slut] RETURN CALCULATE ( [Antal ordrer], REMOVEFILTERS ( dim_date ), dim_date[date_key] > EOMONTH ( _slut, -2 ), dim_date[date_key] <= EOMONTH ( _slut, -1 ) ) · Bruges indirekte i: Månedskort 2']
+  "Ordrer måned label" measure [note: 'Tekst til Månedskort 2: forrige måneds antal ordrer og procentvis ændring til seneste hele måned. · DAX: VAR _cm = [Ordrer seneste måned] VAR _pm = [Ordrer forrige måned] RETURN "Forrige måned: " & FORMAT ( _pm, "#,0" ) & " (" & FORMAT ( DIVIDE ( _cm - _pm, _pm ), "+0.0%;-0.0%;0.0%" ) & ")" · Dashboard: Månedskort 2 (Værdi)']
+  "Ordrer måned farve" measure [note: 'Farvekode til Månedskort 2: rød (#D64550) hvis antal ordrer faldt fra forrige måned, ellers mørk tekstfarve. · DAX: IF ( [Ordrer seneste måned] < [Ordrer forrige måned], "#D64550", "#252423" ) · Dashboard: Månedskort 2 (Formatering)']
+  "Kunder seneste måned" measure [note: 'Antal kunder med salg i seneste hele måned, uanset datofilter. Vises på Månedskort 3. · DAX: VAR _slut = [Seneste hele måned slut] RETURN CALCULATE ( [Antal kunder], REMOVEFILTERS ( dim_date ), dim_date[date_key] > EOMONTH ( _slut, -1 ), dim_date[date_key] <= _slut ) · Dashboard: Månedskort 3 (Værdi)']
+  "Kunder forrige måned" measure [note: 'Antal kunder med salg i måneden før seneste hele måned. Bruges til sammenligning på Månedskort 3. · DAX: VAR _slut = [Seneste hele måned slut] RETURN CALCULATE ( [Antal kunder], REMOVEFILTERS ( dim_date ), dim_date[date_key] > EOMONTH ( _slut, -2 ), dim_date[date_key] <= EOMONTH ( _slut, -1 ) ) · Bruges indirekte i: Månedskort 3']
+  "Kunder måned label" measure [note: 'Tekst til Månedskort 3: forrige måneds antal kunder og procentvis ændring til seneste hele måned. · DAX: VAR _cm = [Kunder seneste måned] VAR _pm = [Kunder forrige måned] RETURN "Forrige måned: " & FORMAT ( _pm, "#,0" ) & " (" & FORMAT ( DIVIDE ( _cm - _pm, _pm ), "+0.0%;-0.0%;0.0%" ) & ")" · Dashboard: Månedskort 3 (Værdi)']
+  "Kunder måned farve" measure [note: 'Farvekode til Månedskort 3: rød (#D64550) hvis antal kunder faldt fra forrige måned, ellers mørk tekstfarve. · DAX: IF ( [Kunder seneste måned] < [Kunder forrige måned], "#D64550", "#252423" ) · Dashboard: Månedskort 3 (Formatering)']
+  "Top underkategori" measure [note: 'Underkategori med flest ordrer i den aktuelle filterkontekst. · DAX: VAR _items = FILTER ( VALUES ( dim_products[subcategory] ), NOT ISBLANK ( dim_products[subcategory] ) ) VAR _top1 = TOPN ( 1, _items, [Antal ordrer], DESC ) RETURN CONCATENATEX ( _top1, dim_products[subcategory], ", " ) · Dashboard: Fremhævning 1 (Værdi)']
+  "Top land" measure [note: 'Land med flest ordrer. Kunder uden land (n/a) tæller ikke med. · DAX: VAR _items = FILTER ( VALUES ( dim_customers[country] ), NOT ISBLANK ( dim_customers[country] ) && dim_customers[country] <> "n/a" ) VAR _top1 = TOPN ( 1, _items, [Antal ordrer], DESC ) RETURN CONCATENATEX ( _top1, dim_customers[country], ", " ) · Dashboard: Fremhævning 2 (Værdi)']
+
+  Note: '''Samlet tabel til alle measures. Kolonnen er kun en pladsholder og er skjult.
+Type: Measures
+Dashboard: Fremhævning 1, Fremhævning 2, KPI 1, KPI 2, KPI 3, KPI 4, Månedskort 1, Månedskort 2, Månedskort 3, Søjler pr. kategori, Top 10-tabel, Trend'''
+}
+
+Table "dim_customers" [headercolor: #605E5C] {
+  "customer_key" int64 [pk, note: 'Surrogatnøgle for kunden. Relation til fact_sales[customer_key]. · Skjult · Oprindelse: gold.dim_customers.customer_key']
+  "customer_id" int64 [note: 'Kundens id i kildesystemet. · Skjult · Oprindelse: gold.dim_customers.customer_id']
+  "customer_number" string [note: 'Kundenummer fra kildesystemet (forretningsnøgle). · Oprindelse: gold.dim_customers.customer_number']
+  "first_name" string [note: 'Kundens fornavn. · Oprindelse: gold.dim_customers.first_name · Mulig PII']
+  "last_name" string [note: 'Kundens efternavn. · Oprindelse: gold.dim_customers.last_name · Mulig PII']
+  "country" string [note: 'Kundens land. Bruges til fremhævningen af top-land på dashboardet. · Oprindelse: gold.dim_customers.country']
+  "marital_status" string [note: 'Kundens civilstand. · Oprindelse: gold.dim_customers.marital_status']
+  "gender" string [note: 'Kundens køn. · Oprindelse: gold.dim_customers.gender · Mulig PII']
+  "birthdate" dateTime [note: 'Kundens fødselsdato. · Oprindelse: gold.dim_customers.birthdate · Mulig PII']
+  "create_date" dateTime [note: 'Dato hvor kunden blev oprettet i kildesystemet. · Oprindelse: gold.dim_customers.create_date']
+
+  Note: '''Kundedimension med én række pr. kunde, hentet fra gold.dim_customers i Supabase.
+Type: Dimension
+Kilde: PostgreSQL: aws-0-eu-west-2.pooler.supabase.com / postgres
+Kildeobjekter: gold.dim_customers
+Power Query: GoldKilde'''
+}
+
+Table "dim_date" [headercolor: #252423] {
+  "date_key" dateTime [pk, note: 'Dato (én række pr. dag). Nøgle til fact_sales: aktiv relation på ordredato og inaktive relationer på afsendelses- og forfaldsdato. · Oprindelse: Beregnet i dim_date (trin Start)']
+  "year" int64 [note: 'Kalenderår. · Oprindelse: Beregnet i dim_date (trin Aar)']
+  "quarter" string [note: 'Kvartal som tekst, fx K1–K4. · Oprindelse: Beregnet i dim_date (trin Kvartal)']
+  "month_no" int64 [note: 'Månedsnummer 1–12. Bruges til sortering af månedsnavne. · Skjult · Oprindelse: Beregnet i dim_date (trin MaanedNr)']
+  "month_name" string [note: 'Forkortet dansk månedsnavn (fx jan, feb). · Oprindelse: Beregnet i dim_date (trin Maaned) · Mulig PII']
+  "year_month" string [note: 'År og måned som tekst i formatet yyyy-MM. · Oprindelse: Beregnet i dim_date (trin AarMaaned)']
+  "month_start" dateTime [note: 'Første dag i måneden. Månedsakse på trendgrafen og månedskortene. · Oprindelse: Beregnet i dim_date (trin Maanedstart) · Dashboard: Trend (Kategori); Månedskort 1 (Kategori); Månedskort 2 (Kategori); Månedskort 3 (Kategori)']
+  "week_no" int64 [note: 'Ugenummer med mandag som første ugedag. · Oprindelse: Beregnet i dim_date (trin Uge)']
+  "day_of_week_no" int64 [note: 'Ugedagsnummer 1–7, hvor mandag er 1. Bruges til sortering af ugedage. · Skjult · Oprindelse: Beregnet i dim_date (trin UgedagNr)']
+  "day_name" string [note: 'Forkortet dansk ugedagsnavn (fx man, tir). · Oprindelse: Beregnet i dim_date (trin Ugedag) · Mulig PII']
+
+  Note: '''Kalendertabel genereret i Power Query. Dækker hele år fra første til sidste dato i fact_sales.
+Type: Dato
+Kilde: PostgreSQL: aws-0-eu-west-2.pooler.supabase.com / postgres
+Power Query: fact_sales
+Dashboard: Månedskort 1, Månedskort 2, Månedskort 3, Trend'''
+}
+
+Table "dim_products" [headercolor: #605E5C] {
+  "product_key" int64 [pk, note: 'Surrogatnøgle for produktet. Relation til fact_sales[product_key]. · Skjult · Oprindelse: gold.dim_products.product_key']
+  "product_id" int64 [note: 'Produktets id i kildesystemet. · Skjult · Oprindelse: gold.dim_products.product_id']
+  "product_number" string [note: 'Produktnummer fra kildesystemet (forretningsnøgle). · Oprindelse: gold.dim_products.product_number']
+  "product_name" string [note: 'Produktnavn. Rækker i top 10-tabellen på dashboardet. · Oprindelse: gold.dim_products.product_name · Mulig PII · Dashboard: Top 10-tabel (Værdi); Top 10-tabel (Filter)']
+  "category_id" string [note: 'Id for produktkategorien. · Skjult · Oprindelse: gold.dim_products.category_id']
+  "category" string [note: 'Produktkategori. Akse på søjlediagrammet over ordrer pr. kategori. · Oprindelse: gold.dim_products.category · Dashboard: Søjler pr. kategori (Kategori); Søjler pr. kategori (Filter)']
+  "subcategory" string [note: 'Produktunderkategori. Bruges til fremhævningen af top-underkategori på dashboardet. · Oprindelse: gold.dim_products.subcategory']
+  "maintenance" string [note: 'Angiver om produktet kræver vedligeholdelse. · Oprindelse: gold.dim_products.maintenance']
+  "cost" int64 [note: 'Kostpris pr. stk. Bruges i Kostpris, Dækningsbidrag og Margin %. · Oprindelse: gold.dim_products.cost']
+  "product_line" string [note: 'Produktlinje. · Oprindelse: gold.dim_products.product_line']
+  "start_date" dateTime [note: 'Dato hvor produktet blev sat i salg. · Oprindelse: gold.dim_products.start_date']
+
+  Note: '''Produktdimension med én række pr. produkt inkl. kategori, underkategori og kostpris, hentet fra gold.dim_products i Supabase.
+Type: Dimension
+Kilde: PostgreSQL: aws-0-eu-west-2.pooler.supabase.com / postgres
+Kildeobjekter: gold.dim_products
+Power Query: GoldKilde
+Dashboard: Søjler pr. kategori, Top 10-tabel'''
+}
+
+Table "fact_sales" [headercolor: #333333] {
+  "order_number" string [note: 'Ordrenummer. Flere linjer kan dele samme ordrenummer; tælles distinkt i Antal ordrer. · Oprindelse: gold.fact_sales.order_number · Dashboard: Top 10-tabel (Filter)']
+  "product_key" int64 [note: 'Fremmednøgle til dim_products. · Skjult · Oprindelse: gold.fact_sales.product_key']
+  "customer_key" int64 [note: 'Fremmednøgle til dim_customers. Tælles distinkt i Antal kunder. · Skjult · Oprindelse: gold.fact_sales.customer_key']
+  "order_date" dateTime [note: 'Ordredato. Aktiv relation til dim_date. · Skjult · Oprindelse: gold.fact_sales.order_date']
+  "shipping_date" dateTime [note: 'Afsendelsesdato. Inaktiv relation til dim_date (bruges via USERELATIONSHIP). · Oprindelse: gold.fact_sales.shipping_date · Mulig PII']
+  "due_date" dateTime [note: 'Forfaldsdato. Inaktiv relation til dim_date (bruges via USERELATIONSHIP). · Oprindelse: gold.fact_sales.due_date']
+  "sales_amount" int64 [note: 'Salgsbeløb for ordrelinjen. Grundlag for Omsætning. · Oprindelse: gold.fact_sales.sales_amount']
+  "quantity" int64 [note: 'Antal solgte enheder på ordrelinjen. · Oprindelse: gold.fact_sales.quantity']
+  "price" int64 [note: 'Pris pr. enhed på ordrelinjen. · Oprindelse: gold.fact_sales.price']
+
+  Note: '''Salgsfakta med én række pr. ordrelinje: beløb, antal og pris samt ordre-, afsendelses- og forfaldsdato. Hentet fra gold.fact_sales i Supabase.
+Type: Fakta
+Kilde: PostgreSQL: aws-0-eu-west-2.pooler.supabase.com / postgres
+Kildeobjekter: gold.fact_sales
+Power Query: GoldKilde
+Inaktive relationer (USERELATIONSHIP): shipping_date → dim_date.date_key; due_date → dim_date.date_key
+Dashboard: KPI 3, KPI 4, Top 10-tabel'''
+}
+
+TableGroup "Fakta" {
+  "fact_sales"
+}
+
+TableGroup "Dimension" {
+  "dim_customers"
+  "dim_products"
+}
+
+TableGroup "Dato" {
+  "dim_date"
+}
+
+TableGroup "Measures" {
+  "_Measures"
+}
+
+Ref: "fact_sales"."customer_key" > "dim_customers"."customer_key"
+Ref: "fact_sales"."product_key" > "dim_products"."product_key"
+Ref: "fact_sales"."order_date" > "dim_date"."date_key"
+Ref: "fact_sales"."shipping_date" > "dim_date"."date_key"  // inaktiv (USERELATIONSHIP)
+Ref: "fact_sales"."due_date" > "dim_date"."date_key"  // inaktiv (USERELATIONSHIP)
