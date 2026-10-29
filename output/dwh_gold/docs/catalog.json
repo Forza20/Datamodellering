@@ -1,6 +1,6 @@
 {
   "project": "dwh_gold",
-  "generated": "2026-10-29T19:56:59",
+  "generated": "2026-10-29T20:00:01",
   "slotsSource": "udledt af dashboard-siden",
   "tables": [
     {
@@ -19,7 +19,7 @@
       "Beskrivelse": "Samlet tabel til alle measures. Kolonnen er kun en pladsholder og er skjult.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Ingen – measure-tabel i Power BI",
       "Status": "Fra model",
       "Beskrivelseskilde": "TMDL"
     },
@@ -39,8 +39,8 @@
       "Beskrivelse": "Kundedimension med én række pr. kunde, hentet fra gold.dim_customers i Supabase.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "gold.load_gold(): silver.crm_cust_info (CRM) + silver.erp_cust_az12 og silver.erp_loc_a101 (ERP, left join på cst_key = cid) ← bronze",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -59,7 +59,7 @@
       "Beskrivelse": "Kalendertabel genereret i Power Query. Dækker hele år fra første til sidste dato i fact_sales.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
+      "Opstrøms kilde": "Genereres i Power Query ud fra datoerne i fact_sales (ingen tabel i Supabase)",
       "Status": "Fra model",
       "Beskrivelseskilde": "TMDL"
     },
@@ -79,8 +79,8 @@
       "Beskrivelse": "Produktdimension med én række pr. produkt inkl. kategori, underkategori og kostpris, hentet fra gold.dim_products i Supabase.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "gold.load_gold(): silver.crm_prd_info (CRM) + silver.erp_px_cat_g1v2 (ERP, left join på cat_id = id), kun aktuelle produkter (prd_end_dt is null) ← bronze",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -99,8 +99,8 @@
       "Beskrivelse": "Salgsfakta med én række pr. ordrelinje: beløb, antal og pris samt ordre-, afsendelses- og forfaldsdato. Hentet fra gold.fact_sales i Supabase.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "gold.load_gold(): silver.crm_sales_details (CRM) + opslag i gold.dim_products og gold.dim_customers ← bronze.crm_sales_details",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     }
   ],
@@ -125,8 +125,8 @@
       "Beskrivelse": "Surrogatnøgle for kunden. Relation til fact_sales[customer_key].",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "Surrogatnøgle i gold: row_number() over cst_id",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -149,8 +149,8 @@
       "Beskrivelse": "Kundens id i kildesystemet.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_cust_info.cst_id ← bronze.crm_cust_info (nyeste række pr. kunde)",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -173,8 +173,8 @@
       "Beskrivelse": "Kundenummer fra kildesystemet (forretningsnøgle).",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_cust_info.cst_key ← bronze.crm_cust_info",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -197,8 +197,8 @@
       "Beskrivelse": "Kundens fornavn.",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_cust_info.cst_firstname (trimmet) ← bronze.crm_cust_info",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -221,8 +221,8 @@
       "Beskrivelse": "Kundens efternavn.",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_cust_info.cst_lastname (trimmet) ← bronze.crm_cust_info",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -245,8 +245,8 @@
       "Beskrivelse": "Kundens land. Bruges til fremhævningen af top-land på dashboardet.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.erp_loc_a101.cntry (DE→Germany, US/USA→United States, tom→n/a) ← bronze.erp_loc_a101",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -269,8 +269,8 @@
       "Beskrivelse": "Kundens civilstand.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_cust_info.cst_marital_status (S/M→Single/Married) ← bronze.crm_cust_info",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -293,8 +293,8 @@
       "Beskrivelse": "Kundens køn.",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_cust_info.cst_gndr; hvis n/a: silver.erp_cust_az12.gen ← bronze (CRM primær, ERP fallback)",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -317,8 +317,8 @@
       "Beskrivelse": "Kundens fødselsdato.",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.erp_cust_az12.bdate (fremtidige datoer→NULL) ← bronze.erp_cust_az12",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -341,8 +341,8 @@
       "Beskrivelse": "Dato hvor kunden blev oprettet i kildesystemet.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_cust_info.cst_create_date ← bronze.crm_cust_info",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -365,8 +365,8 @@
       "Beskrivelse": "Dato (én række pr. dag). Nøgle til fact_sales: aktiv relation på ordredato og inaktive relationer på afsendelses- og forfaldsdato.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -389,8 +389,8 @@
       "Beskrivelse": "Kalenderår.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -413,8 +413,8 @@
       "Beskrivelse": "Kvartal som tekst, fx K1–K4.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -437,8 +437,8 @@
       "Beskrivelse": "Månedsnummer 1–12. Bruges til sortering af månedsnavne.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -461,8 +461,8 @@
       "Beskrivelse": "Forkortet dansk månedsnavn (fx jan, feb).",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -485,8 +485,8 @@
       "Beskrivelse": "År og måned som tekst i formatet yyyy-MM.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -509,8 +509,8 @@
       "Beskrivelse": "Første dag i måneden. Månedsakse på trendgrafen og månedskortene.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -533,8 +533,8 @@
       "Beskrivelse": "Ugenummer med mandag som første ugedag.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -557,8 +557,8 @@
       "Beskrivelse": "Ugedagsnummer 1–7, hvor mandag er 1. Bruges til sortering af ugedage.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -581,8 +581,8 @@
       "Beskrivelse": "Forkortet dansk ugedagsnavn (fx man, tir).",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -605,8 +605,8 @@
       "Beskrivelse": "Surrogatnøgle for produktet. Relation til fact_sales[product_key].",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "Surrogatnøgle i gold: row_number() over prd_start_dt, prd_key",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -629,8 +629,8 @@
       "Beskrivelse": "Produktets id i kildesystemet.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_prd_info.prd_id ← bronze.crm_prd_info",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -653,8 +653,8 @@
       "Beskrivelse": "Produktnummer fra kildesystemet (forretningsnøgle).",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_prd_info.prd_key (prd_key fra tegn 7) ← bronze.crm_prd_info",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -677,8 +677,8 @@
       "Beskrivelse": "Produktnavn. Rækker i top 10-tabellen på dashboardet.",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_prd_info.prd_nm ← bronze.crm_prd_info",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -701,8 +701,8 @@
       "Beskrivelse": "Id for produktkategorien.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_prd_info.cat_id (første 5 tegn af prd_key, - → _) ← bronze.crm_prd_info",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -725,8 +725,8 @@
       "Beskrivelse": "Produktkategori. Akse på søjlediagrammet over ordrer pr. kategori.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.erp_px_cat_g1v2.cat ← bronze.erp_px_cat_g1v2",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -749,8 +749,8 @@
       "Beskrivelse": "Produktunderkategori. Bruges til fremhævningen af top-underkategori på dashboardet.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.erp_px_cat_g1v2.subcat ← bronze.erp_px_cat_g1v2",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -773,8 +773,8 @@
       "Beskrivelse": "Angiver om produktet kræver vedligeholdelse.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.erp_px_cat_g1v2.maintenance ← bronze.erp_px_cat_g1v2",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -797,8 +797,8 @@
       "Beskrivelse": "Kostpris pr. stk. Bruges i Kostpris, Dækningsbidrag og Margin %.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_prd_info.prd_cost (NULL→0) ← bronze.crm_prd_info",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -821,8 +821,8 @@
       "Beskrivelse": "Produktlinje.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_prd_info.prd_line (M/R/S/T→Mountain/Road/Other Sales/Touring) ← bronze.crm_prd_info",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -845,8 +845,8 @@
       "Beskrivelse": "Dato hvor produktet blev sat i salg.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_prd_info.prd_start_dt ← bronze.crm_prd_info",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -869,8 +869,8 @@
       "Beskrivelse": "Ordrenummer. Flere linjer kan dele samme ordrenummer; tælles distinkt i Antal ordrer.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_sales_details.sls_ord_num ← bronze.crm_sales_details",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -893,8 +893,8 @@
       "Beskrivelse": "Fremmednøgle til dim_products.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "gold.dim_products.product_key via sls_prd_key = product_number",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -917,8 +917,8 @@
       "Beskrivelse": "Fremmednøgle til dim_customers. Tælles distinkt i Antal kunder.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "gold.dim_customers.customer_key via sls_cust_id = customer_id",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -941,8 +941,8 @@
       "Beskrivelse": "Ordredato. Aktiv relation til dim_date.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_sales_details.sls_order_dt (ugyldig yyyymmdd→NULL) ← bronze.crm_sales_details",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -965,8 +965,8 @@
       "Beskrivelse": "Afsendelsesdato. Inaktiv relation til dim_date (bruges via USERELATIONSHIP).",
       "Ejer": "",
       "Følsomhed": "Mulig PII - vurdér",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_sales_details.sls_ship_dt (ugyldig yyyymmdd→NULL) ← bronze.crm_sales_details",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -989,8 +989,8 @@
       "Beskrivelse": "Forfaldsdato. Inaktiv relation til dim_date (bruges via USERELATIONSHIP).",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_sales_details.sls_due_dt (ugyldig yyyymmdd→NULL) ← bronze.crm_sales_details",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1013,8 +1013,8 @@
       "Beskrivelse": "Salgsbeløb for ordrelinjen. Grundlag for Omsætning.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_sales_details.sls_sales (genberegnet som antal × |pris| hvis ugyldig) ← bronze.crm_sales_details",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1037,8 +1037,8 @@
       "Beskrivelse": "Antal solgte enheder på ordrelinjen.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_sales_details.sls_quantity ← bronze.crm_sales_details",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1061,8 +1061,8 @@
       "Beskrivelse": "Pris pr. enhed på ordrelinjen.",
       "Ejer": "",
       "Følsomhed": "",
-      "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Opstrøms kilde": "silver.crm_sales_details.sls_price (salg/antal hvis ugyldig) ← bronze.crm_sales_details",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     }
   ],
@@ -1108,7 +1108,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1130,7 +1130,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1152,7 +1152,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1174,7 +1174,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1196,7 +1196,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1240,7 +1240,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1262,7 +1262,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1284,7 +1284,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1306,7 +1306,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1328,7 +1328,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1350,7 +1350,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1372,7 +1372,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1416,7 +1416,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1526,7 +1526,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1548,7 +1548,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1592,7 +1592,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1614,7 +1614,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1636,7 +1636,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1658,7 +1658,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1680,7 +1680,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1702,7 +1702,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1724,7 +1724,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1746,7 +1746,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1768,7 +1768,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1790,7 +1790,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1812,7 +1812,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {
@@ -1834,7 +1834,7 @@
       "Ejer": "",
       "Følsomhed": "",
       "Opstrøms kilde": "",
-      "Status": "AI-forslag",
+      "Status": "Godkendt",
       "Beskrivelseskilde": "Excel"
     },
     {

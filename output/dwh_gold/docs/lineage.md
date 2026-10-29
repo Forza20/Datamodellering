@@ -1,6 +1,6 @@
 # Data lineage – dwh_gold
 
-Genereret 2026-10-29 19:56 af pbip-catalog. Farver: sort = datakilde, grå = Power Query, mørk = tabel, hvid = kolonne, turkis = measure, rosa = dashboard.
+Genereret 2026-10-29 20:00 af pbip-catalog. Farver: sort = datakilde, grå = Power Query, mørk = tabel, hvid = kolonne, turkis = measure, rosa = dashboard.
 
 ## Overblik (tabelniveau)
 
