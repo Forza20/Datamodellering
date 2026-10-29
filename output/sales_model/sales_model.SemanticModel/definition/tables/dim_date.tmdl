@@ -1,7 +1,9 @@
+/// Kalendertabel genereret i Power Query, én række pr. dag.
 table dim_date
 	dataCategory: Time
 	lineageTag: fbf9dc7d-e2cf-4a97-91f8-52f85fb7df0b
 
+	/// Dato (én række pr. dag). Nøgle til faktatabellerne.
 	column date_key
 		dataType: dateTime
 		isKey
@@ -13,6 +15,7 @@ table dim_date
 		annotation SummarizationSetBy = Automatic
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Kalenderår.
 	column year
 		dataType: int64
 		formatString: 0
@@ -22,6 +25,7 @@ table dim_date
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kvartal som tekst, fx K1–K4.
 	column quarter
 		dataType: string
 		lineageTag: 163a4a71-51ce-4752-b315-1d4694369bc6
@@ -30,6 +34,7 @@ table dim_date
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Månedsnummer 1–12. Bruges til sortering af månedsnavne.
 	column month_no
 		dataType: int64
 		isHidden
@@ -40,6 +45,7 @@ table dim_date
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Forkortet dansk månedsnavn.
 	column month_name
 		dataType: string
 		lineageTag: e04a959b-fafd-4bda-8f6e-c438baaf5f24
@@ -49,6 +55,7 @@ table dim_date
 
 		annotation SummarizationSetBy = Automatic
 
+	/// År og måned som tekst i formatet yyyy-MM.
 	column year_month
 		dataType: string
 		lineageTag: d9e4816a-0616-403d-b6c7-29293b73fbbc
@@ -57,6 +64,7 @@ table dim_date
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Første dag i måneden.
 	column month_start
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -67,6 +75,7 @@ table dim_date
 		annotation SummarizationSetBy = Automatic
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Ugenummer med mandag som første ugedag.
 	column week_no
 		dataType: int64
 		formatString: 0

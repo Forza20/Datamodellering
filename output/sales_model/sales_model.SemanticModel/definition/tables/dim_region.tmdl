@@ -1,6 +1,8 @@
+/// Regionsdimension ud fra bylisten. Har en Ukendt-række med nøgle -1.
 table dim_region
 	lineageTag: 69210277-b789-480d-8c79-ff412b82d8e0
 
+	/// Surrogatnøgle for regionen, fortløbende nummer genereret i Power Query. -1 = Ukendt.
 	column region_key
 		dataType: int64
 		isHidden
@@ -11,6 +13,7 @@ table dim_region
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Regionens navn. Bruges også til rækkesikkerhed (RLS) via security-tabellen.
 	column region_name
 		dataType: string
 		lineageTag: 0ebc49ab-2c2c-4055-bac9-0c347071d515

@@ -1,6 +1,8 @@
+/// Kampagneforbrug pr. kampagne pr. dag: visninger, klik og forbrug.
 table fact_campaign_spend
 	lineageTag: d055a5d3-e14f-4157-bd0c-b0892131339d
 
+	/// Dato for forbruget. Relation til dim_date.
 	column date_key
 		dataType: dateTime
 		isHidden
@@ -12,6 +14,7 @@ table fact_campaign_spend
 		annotation SummarizationSetBy = Automatic
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Nøgle til dim_campaign.
 	column campaign_key
 		dataType: int64
 		isHidden
@@ -22,6 +25,7 @@ table fact_campaign_spend
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Antal visninger.
 	column impressions
 		dataType: int64
 		isHidden
@@ -32,6 +36,7 @@ table fact_campaign_spend
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Antal klik.
 	column clicks
 		dataType: int64
 		isHidden
@@ -42,6 +47,7 @@ table fact_campaign_spend
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Forbrug i kroner.
 	column spend
 		dataType: decimal
 		isHidden

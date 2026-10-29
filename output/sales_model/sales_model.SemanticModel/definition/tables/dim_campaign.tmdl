@@ -1,6 +1,8 @@
+/// Kampagnedimension med én række pr. kampagne fra CAMPAIGN_LOG-arket.
 table dim_campaign
 	lineageTag: c03f6aaf-c51c-45ec-a1e9-baa953766fc2
 
+	/// Surrogatnøgle for kampagnen, fortløbende nummer genereret i Power Query.
 	column campaign_key
 		dataType: int64
 		isHidden
@@ -11,6 +13,7 @@ table dim_campaign
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kampagnens navn.
 	column campaign_name
 		dataType: string
 		lineageTag: 659ad89e-e01d-4fde-80d4-a3fae0746e89
@@ -19,6 +22,7 @@ table dim_campaign
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Marketingkanal, kampagnen kører i.
 	column marketing_channel
 		dataType: string
 		lineageTag: 184ab523-ee53-4103-af76-d52bbc0ff311
@@ -27,6 +31,7 @@ table dim_campaign
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kampagnens startdato.
 	column start_date
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -37,6 +42,7 @@ table dim_campaign
 		annotation SummarizationSetBy = Automatic
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Kampagnens slutdato.
 	column end_date
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -47,6 +53,7 @@ table dim_campaign
 		annotation SummarizationSetBy = Automatic
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Kampagnens samlede budget i kroner.
 	column budget
 		dataType: decimal
 		isHidden

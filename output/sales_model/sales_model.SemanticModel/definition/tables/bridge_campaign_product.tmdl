@@ -1,7 +1,9 @@
+/// Skjult brotabel, der kobler kampagner og produkter (mange-til-mange).
 table bridge_campaign_product
 	isHidden
 	lineageTag: 2c660401-9c8f-4e81-95cb-b598c1095ebe
 
+	/// Nøgle til dim_campaign.
 	column campaign_key
 		dataType: int64
 		isHidden
@@ -12,6 +14,7 @@ table bridge_campaign_product
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Nøgle til dim_product.
 	column product_key
 		dataType: int64
 		isHidden

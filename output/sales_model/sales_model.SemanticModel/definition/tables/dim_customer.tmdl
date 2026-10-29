@@ -1,6 +1,8 @@
+/// Kundedimension samlet fra kundestamdata, adresse, by, kreditgrænse og kontaktperson. Har en Ukendt-række med nøgle -1.
 table dim_customer
 	lineageTag: 810ab4eb-4688-4991-adaf-c474da893df4
 
+	/// Surrogatnøgle for kunden, fortløbende nummer genereret i Power Query. -1 = Ukendt.
 	column customer_key
 		dataType: int64
 		isHidden
@@ -11,6 +13,7 @@ table dim_customer
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundens id i kundestamdata (CUST_MASTER).
 	column customer_id
 		dataType: int64
 		formatString: 0
@@ -20,6 +23,7 @@ table dim_customer
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundens navn.
 	column customer_name
 		dataType: string
 		lineageTag: 50c3e20f-6d6e-49d8-bc3e-ff9cad0e6f5b
@@ -28,6 +32,7 @@ table dim_customer
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundesegment.
 	column segment
 		dataType: string
 		lineageTag: d29c951e-89ea-43c3-bb77-156ffa62cc40
@@ -36,6 +41,7 @@ table dim_customer
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Ansvarlig account manager for kunden.
 	column account_manager
 		dataType: string
 		lineageTag: b5f8f66b-79f9-4082-80e0-2b6d5a14c052
@@ -44,6 +50,7 @@ table dim_customer
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundens betalingsbetingelser.
 	column payment_terms
 		dataType: string
 		lineageTag: 5b79eafa-ee6f-4395-90c3-c7e424fd5d40
@@ -52,6 +59,7 @@ table dim_customer
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundens kreditgrænse i kroner.
 	column credit_limit
 		dataType: decimal
 		formatString: #,0.00
@@ -61,6 +69,7 @@ table dim_customer
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundens gadeadresse.
 	column street
 		dataType: string
 		lineageTag: 74398215-3977-4a07-a9e7-24df59ccfdf4
@@ -69,6 +78,7 @@ table dim_customer
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundens by.
 	column city
 		dataType: string
 		lineageTag: b95efd47-f5eb-42b4-97e4-4a869d1a7f68
@@ -77,6 +87,7 @@ table dim_customer
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Region for kundens by.
 	column region
 		dataType: string
 		lineageTag: caf1f76e-3fb4-4d34-9f4b-2a6a99ccee30
@@ -85,6 +96,7 @@ table dim_customer
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundens primære kontaktperson.
 	column primary_contact
 		dataType: string
 		lineageTag: a59d0f0e-a676-4a30-a876-47161f16dbaa

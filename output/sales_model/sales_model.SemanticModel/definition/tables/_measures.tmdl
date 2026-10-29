@@ -1,136 +1,164 @@
+/// Samlet measure-tabel for salgsmodellen. Indeholder kun measures; kolonnen er en skjult pladsholder.
 table _measures
 	lineageTag: 990baf89-afd1-420b-97b8-da192df9402d
 
+	/// Nettoomsætning efter rabat (sum af fact_sales[net_amount]). Grundlaget for de fleste andre measures.
 	measure 'Omsætning' = SUM(fact_sales[net_amount])
 		formatString: #,0
 		displayFolder: Salg
 		lineageTag: ea57db35-f831-4fb9-9964-ac8d2d8afa48
 
+	/// Omsætning før rabat: antal × enhedspris (sum af fact_sales[gross_amount]).
 	measure 'Bruttoomsætning' = SUM(fact_sales[gross_amount])
 		formatString: #,0
 		displayFolder: Salg
 		lineageTag: c3abc41c-4dba-44dd-93aa-8029a15c09a6
 
+	/// Samlet rabat i kroner: bruttoomsætning minus nettoomsætning.
 	measure Rabat = SUM(fact_sales[discount_amount])
 		formatString: #,0
 		displayFolder: Salg
 		lineageTag: a7b78d63-15fc-47fb-8184-b19eb26d8220
 
+	/// Rabat i procent af bruttoomsætningen.
 	measure 'Rabat %' = DIVIDE([Rabat], [Bruttoomsætning])
 		formatString: 0.0 %
 		displayFolder: Salg
 		lineageTag: 65895cde-b73b-4cb7-8efd-f6344bf7cb44
 
+	/// Antal unikke ordrer (distinkte order_id).
 	measure 'Antal ordrer' = DISTINCTCOUNT(fact_sales[order_id])
 		formatString: #,0
 		displayFolder: Salg
 		lineageTag: 5386c736-1a2e-4dba-860f-c614b0892d3b
 
+	/// Antal ordrelinjer, dvs. rækker i fact_sales.
 	measure 'Antal ordrelinjer' = COUNTROWS(fact_sales)
 		formatString: #,0
 		displayFolder: Salg
 		lineageTag: bcf856ae-2799-46cd-9e39-8c2980914569
 
+	/// Samlet antal solgte enheder.
 	measure 'Antal enheder' = SUM(fact_sales[quantity])
 		formatString: #,0
 		displayFolder: Salg
 		lineageTag: d960dfe5-0293-44f9-bd82-23f67446639c
 
+	/// Gennemsnitlig nettoomsætning pr. ordre.
 	measure 'Gns. ordreværdi' = DIVIDE([Omsætning], [Antal ordrer])
 		formatString: #,0
 		displayFolder: Salg
 		lineageTag: aed2820c-9008-42da-bcaa-1707b019064f
 
+	/// Nettoomsætning kun for ordrer med status Leveret.
 	measure 'Omsætning (leveret)' = CALCULATE([Omsætning], fact_sales[order_status] = "Leveret")
 		formatString: #,0
 		displayFolder: Salg
 		lineageTag: 59ff0b54-cb6e-4256-8dec-e8096d88bba0
 
+	/// Samlet kostpris for de solgte varer (antal × enhedskost).
 	measure Kostpris = SUM(fact_sales[cost_amount])
 		formatString: #,0
 		displayFolder: Margin
 		lineageTag: a7c4cdda-8d2e-43e3-a88f-bdb8373c21f5
 
+	/// Nettoomsætning minus kostpris.
 	measure Bruttoavance = [Omsætning] - [Kostpris]
 		formatString: #,0
 		displayFolder: Margin
 		lineageTag: 67ba7c5f-e7e0-4bc1-8d83-9caf9bd81b4d
 
+	/// Bruttoavance i procent af nettoomsætningen.
 	measure 'Avance %' = DIVIDE([Bruttoavance], [Omsætning])
 		formatString: 0.0 %
 		displayFolder: Margin
 		lineageTag: f32feb72-6b86-416f-a468-7582fa7475c8
 
+	/// Månedligt salgsmål fra sales_targets (sum af target_amount).
 	measure 'Salgsmål' = SUM(fact_sales_target[target_amount])
 		formatString: #,0
 		displayFolder: Mål
 		lineageTag: 87823cc7-6c31-4eca-948b-e1d6c3285e2d
 
+	/// Nettoomsætning minus salgsmål. Negativ værdi betyder under mål.
 	measure 'Afvigelse til mål' = [Omsætning] - [Salgsmål]
 		formatString: #,0
 		displayFolder: Mål
 		lineageTag: e239373b-f4cf-404d-b2b9-e787bf8d538e
 
+	/// Nettoomsætning i procent af salgsmålet.
 	measure 'Målopfyldelse %' = DIVIDE([Omsætning], [Salgsmål])
 		formatString: 0.0 %
 		displayFolder: Mål
 		lineageTag: 8c487320-a278-464e-8868-8f4c5328444c
 
+	/// Nettoomsætning år-til-dato, akkumuleret fra 1. januar.
 	measure 'Omsætning ÅTD' = TOTALYTD([Omsætning], dim_date[date_key])
 		formatString: #,0
 		displayFolder: Tidsintelligens
 		lineageTag: a100aee5-b5bf-48d5-8da8-085514341561
 
+	/// Nettoomsætning i samme periode året før.
 	measure 'Omsætning sidste år' = CALCULATE([Omsætning], SAMEPERIODLASTYEAR(dim_date[date_key]))
 		formatString: #,0
 		displayFolder: Tidsintelligens
 		lineageTag: edf7993d-5467-4104-8746-72b2f333f36e
 
+	/// Procentvis vækst i nettoomsætning i forhold til samme periode sidste år.
 	measure 'Vækst %' = DIVIDE([Omsætning] - [Omsætning sidste år], [Omsætning sidste år])
 		formatString: 0.0 %
 		displayFolder: Tidsintelligens
 		lineageTag: b606e42a-a817-4bd1-8c0c-f2defbb69ae1
 
+	/// Samlet forbrug på kampagner i kroner (sum af fact_campaign_spend[spend]).
 	measure Kampagneforbrug = SUM(fact_campaign_spend[spend])
 		formatString: #,0
 		displayFolder: Kampagner
 		lineageTag: edfc057d-6246-463e-9867-4fd001118ec2
 
+	/// Samlet budget for de valgte kampagner (sum af dim_campaign[budget]).
 	measure Kampagnebudget = SUM(dim_campaign[budget])
 		formatString: #,0
 		displayFolder: Kampagner
 		lineageTag: 9de1cc7f-2aea-448b-b3dd-850b39e8b7e4
 
+	/// Kampagneforbrug i procent af kampagnebudgettet.
 	measure 'Budgetforbrug %' = DIVIDE([Kampagneforbrug], [Kampagnebudget])
 		formatString: 0.0 %
 		displayFolder: Kampagner
 		lineageTag: e9f60f28-5ba0-4f74-bce0-e3ba7862d6bb
 
+	/// Antal visninger (impressions) af kampagnerne.
 	measure Visninger = SUM(fact_campaign_spend[impressions])
 		formatString: #,0
 		displayFolder: Kampagner
 		lineageTag: b795217f-a2f9-4298-940a-52760383d0a6
 
+	/// Antal klik på kampagnerne.
 	measure Klik = SUM(fact_campaign_spend[clicks])
 		formatString: #,0
 		displayFolder: Kampagner
 		lineageTag: d35c63d8-55f6-4555-b37c-ce95164585bb
 
+	/// Klikrate: klik i procent af visninger.
 	measure 'CTR %' = DIVIDE([Klik], [Visninger])
 		formatString: 0.00 %
 		displayFolder: Kampagner
 		lineageTag: 0f7bb0ab-4f97-447c-bfc0-051b65387357
 
+	/// Kampagneforbrug divideret med antal klik.
 	measure 'Pris pr. klik' = DIVIDE([Kampagneforbrug], [Klik])
 		formatString: #,0.00
 		displayFolder: Kampagner
 		lineageTag: 488c7623-c598-45d1-8598-0741c95f4905
 
+	/// Nettoomsætning for produkter, der indgår i de valgte kampagner. Filtrerer via bridge_campaign_product med tovejs krydsfilter.
 	measure 'Omsætning kampagnevarer' = CALCULATE([Omsætning], CROSSFILTER(bridge_campaign_product[product_key], dim_product[product_key], BOTH))
 		formatString: #,0
 		displayFolder: Kampagner
 		lineageTag: 9c240f6e-1fec-4b95-856f-49100441a178
 
+	/// Lagerbeholdning i stk. på den seneste dato med lagerdata i perioden (ikke summeret over tid).
 	measure Lagerbeholdning = CALCULATE(SUM(fact_inventory[stock_qty]), LASTNONBLANK(dim_date[date_key], CALCULATE(COUNTROWS(fact_inventory))))
 		formatString: #,0
 		displayFolder: Lager
