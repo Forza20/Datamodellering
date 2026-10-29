@@ -1,0 +1,252 @@
+// Genereret af pbip-catalog 2026-10-29 – rediger beskrivelser i catalog.xlsx
+Project "sales_model" {
+  database_type: 'Power BI'
+  Note: '''Power BI semantisk model "sales_model". Tabeller, kolonner og measures med beskrivelser, oprindelse og dashboard-pladser i noterne.'''
+}
+
+Table "_measures" [headercolor: #1FC8C0] {
+  "Omsætning" measure [note: 'Nettoomsætning efter rabat (sum af fact_sales[net_amount]). Grundlaget for de fleste andre measures. · DAX: SUM(fact_sales[net_amount])']
+  "Bruttoomsætning" measure [note: 'Omsætning før rabat: antal × enhedspris (sum af fact_sales[gross_amount]). · DAX: SUM(fact_sales[gross_amount])']
+  "Rabat" measure [note: 'Samlet rabat i kroner: bruttoomsætning minus nettoomsætning. · DAX: SUM(fact_sales[discount_amount])']
+  "Rabat %" measure [note: 'Rabat i procent af bruttoomsætningen. · DAX: DIVIDE([Rabat], [Bruttoomsætning])']
+  "Antal ordrer" measure [note: 'Antal unikke ordrer (distinkte order_id). · DAX: DISTINCTCOUNT(fact_sales[order_id])']
+  "Antal ordrelinjer" measure [note: 'Antal ordrelinjer, dvs. rækker i fact_sales. · DAX: COUNTROWS(fact_sales)']
+  "Antal enheder" measure [note: 'Samlet antal solgte enheder. · DAX: SUM(fact_sales[quantity])']
+  "Gns. ordreværdi" measure [note: 'Gennemsnitlig nettoomsætning pr. ordre. · DAX: DIVIDE([Omsætning], [Antal ordrer])']
+  "Omsætning (leveret)" measure [note: 'Nettoomsætning kun for ordrer med status Leveret. · DAX: CALCULATE([Omsætning], fact_sales[order_status] = "Leveret")']
+  "Kostpris" measure [note: 'Samlet kostpris for de solgte varer (antal × enhedskost). · DAX: SUM(fact_sales[cost_amount])']
+  "Bruttoavance" measure [note: 'Nettoomsætning minus kostpris. · DAX: [Omsætning] - [Kostpris]']
+  "Avance %" measure [note: 'Bruttoavance i procent af nettoomsætningen. · DAX: DIVIDE([Bruttoavance], [Omsætning])']
+  "Salgsmål" measure [note: 'Månedligt salgsmål fra sales_targets (sum af target_amount). · DAX: SUM(fact_sales_target[target_amount])']
+  "Afvigelse til mål" measure [note: 'Nettoomsætning minus salgsmål. Negativ værdi betyder under mål. · DAX: [Omsætning] - [Salgsmål]']
+  "Målopfyldelse %" measure [note: 'Nettoomsætning i procent af salgsmålet. · DAX: DIVIDE([Omsætning], [Salgsmål])']
+  "Omsætning ÅTD" measure [note: 'Nettoomsætning år-til-dato, akkumuleret fra 1. januar. · DAX: TOTALYTD([Omsætning], dim_date[date_key])']
+  "Omsætning sidste år" measure [note: 'Nettoomsætning i samme periode året før. · DAX: CALCULATE([Omsætning], SAMEPERIODLASTYEAR(dim_date[date_key]))']
+  "Vækst %" measure [note: 'Procentvis vækst i nettoomsætning i forhold til samme periode sidste år. · DAX: DIVIDE([Omsætning] - [Omsætning sidste år], [Omsætning sidste år])']
+  "Kampagneforbrug" measure [note: 'Samlet forbrug på kampagner i kroner (sum af fact_campaign_spend[spend]). · DAX: SUM(fact_campaign_spend[spend])']
+  "Kampagnebudget" measure [note: 'Samlet budget for de valgte kampagner (sum af dim_campaign[budget]). · DAX: SUM(dim_campaign[budget])']
+  "Budgetforbrug %" measure [note: 'Kampagneforbrug i procent af kampagnebudgettet. · DAX: DIVIDE([Kampagneforbrug], [Kampagnebudget])']
+  "Visninger" measure [note: 'Antal visninger (impressions) af kampagnerne. · DAX: SUM(fact_campaign_spend[impressions])']
+  "Klik" measure [note: 'Antal klik på kampagnerne. · DAX: SUM(fact_campaign_spend[clicks])']
+  "CTR %" measure [note: 'Klikrate: klik i procent af visninger. · DAX: DIVIDE([Klik], [Visninger])']
+  "Pris pr. klik" measure [note: 'Kampagneforbrug divideret med antal klik. · DAX: DIVIDE([Kampagneforbrug], [Klik])']
+  "Omsætning kampagnevarer" measure [note: 'Nettoomsætning for produkter, der indgår i de valgte kampagner. Filtrerer via bridge_campaign_product med tovejs krydsfilter. · DAX: CALCULATE([Omsætning], CROSSFILTER(bridge_campaign_product[product_key], dim_product[product_key], BOTH))']
+  "Lagerbeholdning" measure [note: 'Lagerbeholdning i stk. på den seneste dato med lagerdata i perioden (ikke summeret over tid). · DAX: CALCULATE(SUM(fact_inventory[stock_qty]), LASTNONBLANK(dim_date[date_key], CALCULATE(COUNTROWS(fact_inventory))))']
+
+  Note: '''Samlet measure-tabel for salgsmodellen. Indeholder kun measures; kolonnen er en skjult pladsholder.
+Type: Measures'''
+}
+
+Table "bridge_campaign_product" [headercolor: #605E5C] {
+  "campaign_key" int64 [note: 'Nøgle til dim_campaign. · Skjult · Oprindelse: Beregnet i dim_campaign (trin MedKey)']
+  "product_key" int64 [note: 'Nøgle til dim_product. · Skjult · Oprindelse: Beregnet i dim_product (trin MedKey)']
+
+  Note: '''Skjult brotabel, der kobler kampagner og produkter (mange-til-mange).
+Type: Bro
+Kilde: Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx
+Power Query: dim_campaign, dim_product, slv_campaign_sku'''
+}
+
+Table "dim_campaign" [headercolor: #605E5C] {
+  "campaign_key" int64 [pk, note: 'Surrogatnøgle for kampagnen, fortløbende nummer genereret i Power Query. · Skjult · Oprindelse: Beregnet i dim_campaign (trin MedKey)']
+  "campaign_name" string [note: 'Kampagnens navn. · Oprindelse: CAMPAIGN_LOG (Sheet).CampaignName · Mulig PII']
+  "marketing_channel" string [note: 'Marketingkanal, kampagnen kører i. · Oprindelse: CAMPAIGN_LOG (Sheet).Channel']
+  "start_date" dateTime [note: 'Kampagnens startdato. · Oprindelse: CAMPAIGN_LOG (Sheet).StartDate']
+  "end_date" dateTime [note: 'Kampagnens slutdato. · Oprindelse: CAMPAIGN_LOG (Sheet).EndDate']
+  "budget" decimal [note: 'Kampagnens samlede budget i kroner. · Skjult · Oprindelse: CAMPAIGN_LOG (Sheet).Budget']
+
+  Note: '''Kampagnedimension med én række pr. kampagne fra CAMPAIGN_LOG-arket.
+Type: Dimension
+Kilde: Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx
+Kildeobjekter: CAMPAIGN_LOG (Sheet)
+Power Query: slv_campaign_log'''
+}
+
+Table "dim_channel" [headercolor: #605E5C] {
+  "channel_key" int64 [pk, note: 'Kanalnøgle (10 Web, 20 Butik, 30 Telefon, 40 Partner, -1 Ukendt). · Skjult · Oprindelse: Beregnet i dim_channel (trin Kanaler)']
+  "channel_name" string [note: 'Salgskanalens navn. · Oprindelse: Beregnet i dim_channel (trin Kanaler) · Mulig PII']
+
+  Note: '''Salgskanaler som fast liste i Power Query: Web, Butik, Telefon, Partner og Ukendt.
+Type: Dimension'''
+}
+
+Table "dim_customer" [headercolor: #605E5C] {
+  "customer_key" int64 [pk, note: 'Surrogatnøgle for kunden, fortløbende nummer genereret i Power Query. -1 = Ukendt. · Skjult · Oprindelse: Beregnet i dim_customer (trin MedKey)']
+  "customer_id" int64 [note: 'Kundens id i kundestamdata (CUST_MASTER). · Oprindelse: CUST_MASTER (Sheet).CustomerID']
+  "customer_name" string [note: 'Kundens navn. · Oprindelse: CUST_MASTER (Sheet).CustomerName · Mulig PII']
+  "segment" string [note: 'Kundesegment. · Oprindelse: CUST_MASTER (Sheet).Segment']
+  "account_manager" string [note: 'Ansvarlig account manager for kunden. · Oprindelse: CUST_MASTER (Sheet).AccountManager · Mulig PII']
+  "payment_terms" string [note: 'Kundens betalingsbetingelser. · Oprindelse: CUST_MASTER (Sheet).PaymentTerms']
+  "credit_limit" decimal [note: 'Kundens kreditgrænse i kroner. · Oprindelse: user_details (Sheet).CreditLimit']
+  "street" string [note: 'Kundens gadeadresse. · Oprindelse: Address (Sheet).Street']
+  "city" string [note: 'Kundens by. · Oprindelse: Address (Sheet).CityName · Mulig PII']
+  "region" string [note: 'Region for kundens by. · Oprindelse: cities (Sheet).RegionName']
+  "primary_contact" string [note: 'Kundens primære kontaktperson. · Oprindelse: customer_contacts (Sheet).ContactName']
+
+  Note: '''Kundedimension samlet fra kundestamdata, adresse, by, kreditgrænse og kontaktperson. Har en Ukendt-række med nøgle -1.
+Type: Dimension
+Kilde: Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx
+Kildeobjekter: Address (Sheet), CUST_MASTER (Sheet), cities (Sheet), customer_contacts (Sheet), user_details (Sheet)
+Power Query: slv_address, slv_city, slv_contact, slv_credit, slv_customer'''
+}
+
+Table "dim_date" [headercolor: #252423] {
+  "date_key" dateTime [pk, note: 'Dato (én række pr. dag). Nøgle til faktatabellerne. · Oprindelse: Beregnet i dim_date (trin Start)']
+  "year" int64 [note: 'Kalenderår. · Oprindelse: Beregnet i dim_date (trin Aar)']
+  "quarter" string [note: 'Kvartal som tekst, fx K1–K4. · Oprindelse: Beregnet i dim_date (trin Kvartal)']
+  "month_no" int64 [note: 'Månedsnummer 1–12. Bruges til sortering af månedsnavne. · Skjult · Oprindelse: Beregnet i dim_date (trin MaanedNr)']
+  "month_name" string [note: 'Forkortet dansk månedsnavn. · Oprindelse: Beregnet i dim_date (trin Maaned) · Mulig PII']
+  "year_month" string [note: 'År og måned som tekst i formatet yyyy-MM. · Oprindelse: Beregnet i dim_date (trin AarMaaned)']
+  "month_start" dateTime [note: 'Første dag i måneden. · Oprindelse: Beregnet i dim_date (trin Maanedstart)']
+  "week_no" int64 [note: 'Ugenummer med mandag som første ugedag. · Oprindelse: Beregnet i dim_date (trin Uge)']
+
+  Note: '''Kalendertabel genereret i Power Query, én række pr. dag.
+Type: Dato
+Kilde: Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx
+Power Query: slv_campaign_log, slv_inventory, slv_order, slv_sales_target'''
+}
+
+Table "dim_product" [headercolor: #605E5C] {
+  "product_key" int64 [pk, note: 'Surrogatnøgle for produktet, fortløbende nummer genereret i Power Query. -1 = Ukendt. · Skjult · Oprindelse: Beregnet i dim_product (trin MedKey)']
+  "product_code" string [note: 'Produktkode fra produktarket (forretningsnøgle). · Oprindelse: products (Sheet).ProductCode']
+  "product_name" string [note: 'Produktnavn. · Oprindelse: products (Sheet).ProductName · Mulig PII']
+  "brand" string [note: 'Produktets brand. · Oprindelse: products (Sheet).Brand']
+  "category" string [note: 'Produktkategori, slået op via underkategorien (match uden forskel på store og små bogstaver). · Oprindelse: SubLower[Category]']
+  "subcategory" string [note: 'Produktets underkategori. · Oprindelse: SubLower[Subcategory]']
+  "list_price" decimal [note: 'Listepris pr. stk. · Oprindelse: products (Sheet).UnitPrice']
+  "primary_supplier" string [note: 'Produktets primære leverandør. · Oprindelse: products (Sheet).PrimarySupplier']
+
+  Note: '''Produktdimension med kategori og underkategori. Har en Ukendt-række med nøgle -1.
+Type: Dimension
+Kilde: Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx
+Kildeobjekter: products (Sheet)
+Power Query: slv_product, slv_subcategory'''
+}
+
+Table "dim_region" [headercolor: #605E5C] {
+  "region_key" int64 [pk, note: 'Surrogatnøgle for regionen, fortløbende nummer genereret i Power Query. -1 = Ukendt. · Skjult · Oprindelse: Beregnet i dim_region (trin MedKey)']
+  "region_name" string [note: 'Regionens navn. Bruges også til rækkesikkerhed (RLS) via security-tabellen. · Oprindelse: cities (Sheet).RegionName · Mulig PII']
+
+  Note: '''Regionsdimension ud fra bylisten. Har en Ukendt-række med nøgle -1.
+Type: Dimension
+Kilde: Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx
+Kildeobjekter: cities (Sheet)
+Power Query: slv_city'''
+}
+
+Table "fact_campaign_spend" [headercolor: #333333] {
+  "date_key" dateTime [note: 'Dato for forbruget. Relation til dim_date. · Skjult · Oprindelse: CAMPAIGN_LOG (Sheet).Date']
+  "campaign_key" int64 [note: 'Nøgle til dim_campaign. · Skjult · Oprindelse: Beregnet i dim_campaign (trin MedKey)']
+  "impressions" int64 [note: 'Antal visninger. · Skjult · Oprindelse: CAMPAIGN_LOG (Sheet).Impressions']
+  "clicks" int64 [note: 'Antal klik. · Skjult · Oprindelse: CAMPAIGN_LOG (Sheet).Clicks']
+  "spend" decimal [note: 'Forbrug i kroner. · Skjult · Oprindelse: CAMPAIGN_LOG (Sheet).Spend']
+
+  Note: '''Kampagneforbrug pr. kampagne pr. dag: visninger, klik og forbrug.
+Type: Fakta
+Kilde: Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx
+Kildeobjekter: CAMPAIGN_LOG (Sheet)
+Power Query: dim_campaign, slv_campaign_log'''
+}
+
+Table "fact_inventory" [headercolor: #333333] {
+  "date_key" dateTime [note: 'Første dag i måneden for lagerbeholdningen. Relation til dim_date. · Skjult · Oprindelse: Beregnet i slv_inventory (trin MedDato)']
+  "product_key" int64 [note: 'Nøgle til dim_product. · Skjult · Oprindelse: Beregnet i dim_product (trin MedKey)']
+  "stock_qty" int64 [note: 'Lagerbeholdning i stk. ved månedens opgørelse. Må ikke summeres over tid. · Skjult · Oprindelse: inventory (Sheet).StockQty']
+
+  Note: '''Lagerbeholdning pr. produkt pr. måned. Arket har én kolonne pr. måned og er unpivoteret i Power Query.
+Type: Fakta
+Kilde: Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx
+Kildeobjekter: inventory (Sheet)
+Power Query: dim_product, slv_inventory'''
+}
+
+Table "fact_sales" [headercolor: #333333] {
+  "line_id" string [note: 'Ordrelinjens id. · Oprindelse: order_line_items (Sheet).LineID']
+  "order_id" string [note: 'Ordrens id. Flere linjer kan have samme ordre. · Oprindelse: order_line_items (Sheet).OrderID']
+  "date_key" dateTime [note: 'Ordredato. Relation til dim_date. · Skjult · Oprindelse: ORDERS_2025 (Sheet).OrderDate']
+  "customer_key" int64 [note: 'Nøgle til dim_customer. -1 hvis kunden ikke findes. · Skjult · Oprindelse: Beregnet i dim_customer (trin MedKey)']
+  "product_key" int64 [note: 'Nøgle til dim_product. -1 hvis produktet ikke findes. · Skjult · Oprindelse: Beregnet i dim_product (trin MedKey)']
+  "channel_key" int64 [note: 'Nøgle til dim_channel. -1 hvis kanalen ikke findes. · Skjult · Oprindelse: Beregnet i dim_channel (trin Kanaler)']
+  "region_key" int64 [note: 'Nøgle til dim_region. -1 hvis regionen ikke findes. · Skjult · Oprindelse: Beregnet i dim_region (trin MedKey)']
+  "order_status" string [note: 'Ordrestatus på dansk: Leveret, Afsendt eller Under behandling. · Oprindelse: ORDERS_2025 (Sheet).Status']
+  "order_priority" string [note: 'Ordreprioritet, fx Ekspres. · Oprindelse: ORDERS_2025 (Sheet).Priority']
+  "quantity" int64 [note: 'Antal enheder på ordrelinjen. · Skjult · Oprindelse: order_line_items (Sheet).Quantity']
+  "unit_price" decimal [note: 'Enhedspris før rabat. · Skjult · Oprindelse: order_line_items (Sheet).UnitPrice']
+  "discount_pct" double [note: 'Rabat i procent på ordrelinjen (0 hvis tom). · Skjult · Oprindelse: order_line_items (Sheet).DiscountPct']
+  "gross_amount" decimal [note: 'Bruttobeløb: antal × enhedspris, afrundet til 2 decimaler. · Skjult · Oprindelse: Beregnet i fact_sales (trin Brutto)']
+  "discount_amount" decimal [note: 'Rabatbeløb: bruttobeløb minus nettobeløb. · Skjult · Oprindelse: Beregnet i fact_sales (trin Rabat)']
+  "net_amount" decimal [note: 'Nettobeløb efter rabat: bruttobeløb × (1 − rabat %), afrundet til 2 decimaler. · Skjult · Oprindelse: Beregnet i fact_sales (trin Netto)']
+  "cost_amount" decimal [note: 'Kostpris for ordrelinjen: antal × enhedskost, afrundet til 2 decimaler. · Skjult · Oprindelse: Beregnet i fact_sales (trin Kost)']
+
+  Note: '''Salgsfakta med én række pr. ordrelinje: ordre, kunde, produkt, kanal, region, status samt brutto, rabat, netto og kostpris.
+Type: Fakta
+Kilde: Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx
+Kildeobjekter: ORDERS_2025 (Sheet), order_line_items (Sheet)
+Power Query: dim_channel, dim_customer, dim_product, dim_region, slv_order, slv_order_line'''
+}
+
+Table "fact_sales_target" [headercolor: #333333] {
+  "date_key" dateTime [note: 'Første dag i måneden for salgsmålet. Relation til dim_date. · Skjult · Oprindelse: Beregnet i slv_sales_target (trin MedDato)']
+  "target_amount" decimal [note: 'Salgsmål for måneden i kroner. · Skjult · Oprindelse: sales_targets (Sheet).TargetRevenue']
+
+  Note: '''Månedlige salgsmål fra sales_targets-arket, én række pr. måned.
+Type: Fakta
+Kilde: Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx
+Kildeobjekter: sales_targets (Sheet)
+Power Query: slv_sales_target'''
+}
+
+Table "security" [headercolor: #C8C6C4] {
+  "user_email" string [note: 'Brugerens e-mail i små bogstaver. Matches mod USERPRINCIPALNAME() i rollen Region. · Skjult · Oprindelse: security (Sheet).UserEmail · Mulig PII']
+  "region" string [note: 'Region, brugeren har adgang til. · Skjult · Oprindelse: security (Sheet).Region']
+
+  Note: '''Skjult tabel til rækkesikkerhed (RLS): kobler brugerens e-mail til den region, brugeren må se.
+Type: Hjælpe
+Kilde: Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx
+Kildeobjekter: security (Sheet)
+Power Query: slv_security'''
+}
+
+TableGroup "Fakta" {
+  "fact_campaign_spend"
+  "fact_inventory"
+  "fact_sales"
+  "fact_sales_target"
+}
+
+TableGroup "Bro" {
+  "bridge_campaign_product"
+}
+
+TableGroup "Dimension" {
+  "dim_campaign"
+  "dim_channel"
+  "dim_customer"
+  "dim_product"
+  "dim_region"
+}
+
+TableGroup "Dato" {
+  "dim_date"
+}
+
+TableGroup "Measures" {
+  "_measures"
+}
+
+TableGroup "Hjælpe" {
+  "security"
+}
+
+Ref: "fact_sales"."date_key" > "dim_date"."date_key"
+Ref: "fact_sales"."customer_key" > "dim_customer"."customer_key"
+Ref: "fact_sales"."product_key" > "dim_product"."product_key"
+Ref: "fact_sales"."channel_key" > "dim_channel"."channel_key"
+Ref: "fact_sales"."region_key" > "dim_region"."region_key"
+Ref: "fact_campaign_spend"."date_key" > "dim_date"."date_key"
+Ref: "fact_campaign_spend"."campaign_key" > "dim_campaign"."campaign_key"
+Ref: "fact_inventory"."date_key" > "dim_date"."date_key"
+Ref: "fact_inventory"."product_key" > "dim_product"."product_key"
+Ref: "fact_sales_target"."date_key" > "dim_date"."date_key"
+Ref: "bridge_campaign_product"."campaign_key" > "dim_campaign"."campaign_key"
+Ref: "bridge_campaign_product"."product_key" > "dim_product"."product_key"
