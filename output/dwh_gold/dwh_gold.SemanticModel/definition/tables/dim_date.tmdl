@@ -1,7 +1,7 @@
 /// Kalendertabel genereret i Power Query. Dækker hele år fra første til sidste dato i fact_sales.
 table dim_date
-	dataCategory: Time
 	lineageTag: 8588ac66-a501-4296-90e1-51352f08dc93
+	dataCategory: Time
 
 	column date_key
 		dataType: dateTime
@@ -12,6 +12,7 @@ table dim_date
 		sourceColumn: date_key
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation UnderlyingDateTimeDataType = Date
 
 	column year
@@ -72,6 +73,7 @@ table dim_date
 		sourceColumn: month_start
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation UnderlyingDateTimeDataType = Date
 
 	column week_no
@@ -128,3 +130,4 @@ table dim_date
 					Ugedag
 
 	annotation PBI_ResultType = Table
+

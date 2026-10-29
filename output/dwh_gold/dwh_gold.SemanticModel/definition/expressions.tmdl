@@ -1,11 +1,13 @@
 /// Supabase pooler (session mode) inkl. port. Find host under Project Settings > Database > Connection pooling.
-expression PgServer = "aws-0-REGION.pooler.supabase.com:5432" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+expression PgServer = "aws-0-eu-west-2.pooler.supabase.com" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
 	lineageTag: 31b5be63-a09d-45fc-9f8d-be5a7c877f85
 	queryGroup: Parametre
 
 	annotation PBI_ResultType = Text
 
-expression PgDatabase = "postgres" meta [IsParameterQuery = true, Type = "Text", IsParameterQueryRequired = true]
+	annotation PBI_NavigationStepName = Navigation
+
+expression PgDatabase = "postgres" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
 	lineageTag: 5c92e2c1-a398-4b95-9655-c49cafbad423
 	queryGroup: Parametre
 
@@ -21,3 +23,4 @@ expression GoldKilde =
 	queryGroup: Parametre
 
 	annotation PBI_ResultType = Table
+

@@ -1,0 +1,271 @@
+/// Samlet tabel til alle measures. Kolonnen er kun en pladsholder og er skjult.
+table _Measures
+	lineageTag: 5aced6ab-fe67-4a90-bd55-683c6cbefd70
+
+	/// Sum af salgsbeløb.
+	measure Omsætning = SUM ( fact_sales[sales_amount] )
+		formatString: #,##0
+		displayFolder: Salg
+		lineageTag: 9846e0f2-7d3b-4506-b213-b7086c091768
+
+	measure 'Antal ordrer' = DISTINCTCOUNT ( fact_sales[order_number] )
+		formatString: #,##0
+		displayFolder: Salg
+		lineageTag: 9e5118ea-df49-450b-ade7-e9bed1266289
+
+	measure 'Antal ordrelinjer' = COUNTROWS ( fact_sales )
+		formatString: #,##0
+		displayFolder: Salg
+		lineageTag: d0ee150b-a1c8-41b2-b015-eb9cd46f8e5e
+
+	measure 'Antal enheder' = SUM ( fact_sales[quantity] )
+		formatString: #,##0
+		displayFolder: Salg
+		lineageTag: 14826268-d893-4aeb-926b-f35ddaa3bd3d
+
+	measure 'Gns. ordrelinje' = DIVIDE ( [Omsætning], [Antal ordrelinjer] )
+		formatString: #,##0.00
+		displayFolder: Salg
+		lineageTag: 5de08586-3e85-4714-9d28-f53ad45eda54
+
+	measure 'Gns. ordreværdi' = DIVIDE ( [Omsætning], [Antal ordrer] )
+		formatString: #,##0.00
+		displayFolder: Salg
+		lineageTag: 932b7626-7031-4546-8c7a-d63c57826fc8
+
+	/// Kunder med salg i den aktuelle filterkontekst.
+	measure 'Antal kunder' = DISTINCTCOUNT ( fact_sales[customer_key] )
+		formatString: #,##0
+		displayFolder: Kunder
+		lineageTag: fbd33cff-34b2-4901-a074-1e5b7a5152cb
+
+	measure 'Omsætning pr. kunde' = DIVIDE ( [Omsætning], [Antal kunder] )
+		formatString: #,##0.00
+		displayFolder: Kunder
+		lineageTag: 105a40bb-4fc9-4367-abfe-ba9502f0a603
+
+	measure 'Omsætning YTD' = TOTALYTD ( [Omsætning], dim_date[date_key] )
+		formatString: #,##0
+		displayFolder: Tidsintelligens
+		lineageTag: 12e7e5bf-0508-4a60-97e1-4f39bfffc963
+
+	measure 'Omsætning sidste år' = CALCULATE ( [Omsætning], SAMEPERIODLASTYEAR ( dim_date[date_key] ) )
+		formatString: #,##0
+		displayFolder: Tidsintelligens
+		lineageTag: 6c67473e-7a8f-484c-8fa0-5ae4061be29f
+
+	measure 'Omsætning YoY' =
+			VAR _aar = [Omsætning]
+			VAR _sidsteAar = [Omsætning sidste år]
+			RETURN
+			    IF ( NOT ISBLANK ( _aar ) && NOT ISBLANK ( _sidsteAar ), _aar - _sidsteAar )
+		formatString: #,##0
+		displayFolder: Tidsintelligens
+		lineageTag: c8a7c2b0-dde9-4fab-94b1-44bfe405e6c7
+
+	measure 'Omsætning YoY %' =
+			VAR _sidsteAar = [Omsætning sidste år]
+			RETURN
+			    DIVIDE ( [Omsætning] - _sidsteAar, _sidsteAar )
+		formatString: 0.0 %
+		displayFolder: Tidsintelligens
+		lineageTag: 78e20c91-d0a9-4c3a-b8ec-c3ffb8350dd7
+
+	measure 'Omsætning YTD sidste år' = CALCULATE ( [Omsætning YTD], SAMEPERIODLASTYEAR ( dim_date[date_key] ) )
+		formatString: #,##0
+		displayFolder: Tidsintelligens
+		lineageTag: f6bbd411-fc63-47ef-999b-0c81727f81a2
+
+	measure 'Omsætning YTD YoY %' =
+			VAR _ytd = [Omsætning YTD]
+			VAR _ytdSidsteAar = [Omsætning YTD sidste år]
+			RETURN
+			    DIVIDE ( _ytd - _ytdSidsteAar, _ytdSidsteAar )
+		formatString: 0.0 %
+		displayFolder: Tidsintelligens
+		lineageTag: 30dbb567-da08-43fe-a851-ff3433cbde3c
+
+	/// Rang efter omsætning blandt de valgte produkter. Brug som visualfilter (<= 10).
+	measure Produktrang =
+			IF (
+			    ISINSCOPE ( dim_products[product_name] ),
+			    RANKX ( ALLSELECTED ( dim_products[product_name] ), [Omsætning], , DESC, DENSE )
+			)
+		formatString: 0
+		displayFolder: Rangering
+		lineageTag: ab35e97e-e1eb-4798-bf0f-1adba105c5c3
+
+	measure 'Omsætning top 10 produkter' =
+			VAR _top =
+			    TOPN ( 10, ALLSELECTED ( dim_products[product_name] ), [Omsætning], DESC )
+			RETURN
+			    CALCULATE ( [Omsætning], KEEPFILTERS ( _top ) )
+		formatString: #,##0
+		displayFolder: Rangering
+		lineageTag: 39809f54-3301-4a54-a4e5-9136481885c8
+
+	/// Udelader produkter uden salg, ellers ville de fylde hele listen.
+	measure 'Omsætning bund 10 produkter' =
+			VAR _medSalg =
+			    FILTER ( ALLSELECTED ( dim_products[product_name] ), NOT ISBLANK ( [Omsætning] ) )
+			VAR _bund =
+			    TOPN ( 10, _medSalg, [Omsætning], ASC )
+			RETURN
+			    CALCULATE ( [Omsætning], KEEPFILTERS ( _bund ) )
+		formatString: #,##0
+		displayFolder: Rangering
+		lineageTag: 31d95230-9d0f-4486-9b94-93e5134a4e0d
+
+	/// Omsætning fordelt efter afsendelsesdato (inaktiv relation til dim_date).
+	measure 'Omsætning efter afsendelsesdato' = CALCULATE ( [Omsætning], USERELATIONSHIP ( fact_sales[shipping_date], dim_date[date_key] ) )
+		formatString: #,##0
+		displayFolder: Tidsintelligens
+		lineageTag: 8ce3f098-7fcc-4e15-8eb8-8957adae1938
+
+	/// Omsætning fordelt efter forfaldsdato (inaktiv relation til dim_date).
+	measure 'Omsætning efter forfaldsdato' = CALCULATE ( [Omsætning], USERELATIONSHIP ( fact_sales[due_date], dim_date[date_key] ) )
+		formatString: #,##0
+		displayFolder: Tidsintelligens
+		lineageTag: ae80e193-b15c-4528-ab2d-2e6bcc6649c6
+
+	/// Kostpris = antal × kostpris pr. stk. fra dim_products.
+	measure Kostpris = SUMX ( fact_sales, fact_sales[quantity] * RELATED ( dim_products[cost] ) )
+		formatString: #,##0
+		displayFolder: Salg
+		lineageTag: 3886e37a-1444-4a9a-8d5c-603ca4fbcb80
+
+	measure Dækningsbidrag = [Omsætning] - [Kostpris]
+		formatString: #,##0
+		displayFolder: Salg
+		lineageTag: 5a081247-e204-4b45-abe3-90209ee63356
+
+	measure 'Margin %' = DIVIDE ( [Dækningsbidrag], [Omsætning] )
+		formatString: 0.0%
+		displayFolder: Salg
+		lineageTag: e4abc664-6192-4a19-85ff-5f872540d9c5
+
+	/// Sidste dag i seneste HELE måned med salg. Data slutter midt i en måned, så den delvise måned springes over.
+	measure 'Seneste hele måned slut' =
+			VAR _max = CALCULATE ( MAX ( fact_sales[order_date] ), REMOVEFILTERS ( dim_date ) )
+			RETURN
+			    IF ( _max = EOMONTH ( _max, 0 ), _max, EOMONTH ( _max, -1 ) )
+		formatString: yyyy-mm-dd
+		isHidden
+		displayFolder: Dashboard
+		lineageTag: a8f6c93c-c81f-4f94-b4c6-72ae3a85ce8b
+
+	measure 'Omsætning seneste måned' =
+			VAR _slut = [Seneste hele måned slut]
+			RETURN
+			    CALCULATE ( [Omsætning], REMOVEFILTERS ( dim_date ), dim_date[date_key] > EOMONTH ( _slut, -1 ), dim_date[date_key] <= _slut )
+		formatString: #,##0
+		displayFolder: Dashboard
+		lineageTag: 95f6fe6a-b8d7-4418-8aa0-0115be0bf723
+
+	measure 'Omsætning forrige måned' =
+			VAR _slut = [Seneste hele måned slut]
+			RETURN
+			    CALCULATE ( [Omsætning], REMOVEFILTERS ( dim_date ), dim_date[date_key] > EOMONTH ( _slut, -2 ), dim_date[date_key] <= EOMONTH ( _slut, -1 ) )
+		formatString: #,##0
+		displayFolder: Dashboard
+		lineageTag: 5ec93c62-f7a8-4b50-934f-8e0c1512f948
+
+	measure 'Omsætning måned label' =
+			VAR _cm = [Omsætning seneste måned]
+			VAR _pm = [Omsætning forrige måned]
+			RETURN
+			    "Forrige måned: " & FORMAT ( _pm, "#,0" ) & " (" & FORMAT ( DIVIDE ( _cm - _pm, _pm ), "+0.0%;-0.0%;0.0%" ) & ")"
+		displayFolder: Dashboard
+		lineageTag: 8d58ef27-b249-48c3-9b69-257e559523f7
+
+	measure 'Omsætning måned farve' = IF ( [Omsætning seneste måned] < [Omsætning forrige måned], "#D64550", "#252423" )
+		displayFolder: Dashboard
+		lineageTag: 42946535-49f3-4dcb-99f7-b23ffb5db3e6
+
+	measure 'Ordrer seneste måned' =
+			VAR _slut = [Seneste hele måned slut]
+			RETURN
+			    CALCULATE ( [Antal ordrer], REMOVEFILTERS ( dim_date ), dim_date[date_key] > EOMONTH ( _slut, -1 ), dim_date[date_key] <= _slut )
+		formatString: #,##0
+		displayFolder: Dashboard
+		lineageTag: 829854bf-c8e7-415a-9b55-fc85f59c57d6
+
+	measure 'Ordrer forrige måned' =
+			VAR _slut = [Seneste hele måned slut]
+			RETURN
+			    CALCULATE ( [Antal ordrer], REMOVEFILTERS ( dim_date ), dim_date[date_key] > EOMONTH ( _slut, -2 ), dim_date[date_key] <= EOMONTH ( _slut, -1 ) )
+		formatString: #,##0
+		displayFolder: Dashboard
+		lineageTag: 7975e2e5-7589-4c9f-b004-8f5068bbc738
+
+	measure 'Ordrer måned label' =
+			VAR _cm = [Ordrer seneste måned]
+			VAR _pm = [Ordrer forrige måned]
+			RETURN
+			    "Forrige måned: " & FORMAT ( _pm, "#,0" ) & " (" & FORMAT ( DIVIDE ( _cm - _pm, _pm ), "+0.0%;-0.0%;0.0%" ) & ")"
+		displayFolder: Dashboard
+		lineageTag: 9b9b5f1c-552e-4891-aca3-852337e993c2
+
+	measure 'Ordrer måned farve' = IF ( [Ordrer seneste måned] < [Ordrer forrige måned], "#D64550", "#252423" )
+		displayFolder: Dashboard
+		lineageTag: 998e80f6-221e-4561-a01e-b478427fc937
+
+	measure 'Kunder seneste måned' =
+			VAR _slut = [Seneste hele måned slut]
+			RETURN
+			    CALCULATE ( [Antal kunder], REMOVEFILTERS ( dim_date ), dim_date[date_key] > EOMONTH ( _slut, -1 ), dim_date[date_key] <= _slut )
+		formatString: #,##0
+		displayFolder: Dashboard
+		lineageTag: c565147e-de0f-4674-9dab-6f022411af93
+
+	measure 'Kunder forrige måned' =
+			VAR _slut = [Seneste hele måned slut]
+			RETURN
+			    CALCULATE ( [Antal kunder], REMOVEFILTERS ( dim_date ), dim_date[date_key] > EOMONTH ( _slut, -2 ), dim_date[date_key] <= EOMONTH ( _slut, -1 ) )
+		formatString: #,##0
+		displayFolder: Dashboard
+		lineageTag: a223f05e-cf09-4107-839d-bdd2d0c8b1c1
+
+	measure 'Kunder måned label' =
+			VAR _cm = [Kunder seneste måned]
+			VAR _pm = [Kunder forrige måned]
+			RETURN
+			    "Forrige måned: " & FORMAT ( _pm, "#,0" ) & " (" & FORMAT ( DIVIDE ( _cm - _pm, _pm ), "+0.0%;-0.0%;0.0%" ) & ")"
+		displayFolder: Dashboard
+		lineageTag: ed1e7908-1583-4d28-b87f-caa5e6d58ab1
+
+	measure 'Kunder måned farve' = IF ( [Kunder seneste måned] < [Kunder forrige måned], "#D64550", "#252423" )
+		displayFolder: Dashboard
+		lineageTag: f519d5b9-e262-4eee-928e-cb4d7e0cef72
+
+	/// Underkategori med flest ordrer i den aktuelle filterkontekst.
+	measure 'Top underkategori' =
+			VAR _items = FILTER ( VALUES ( dim_products[subcategory] ), NOT ISBLANK ( dim_products[subcategory] ) )
+			VAR _top1 = TOPN ( 1, _items, [Antal ordrer], DESC )
+			RETURN
+			    CONCATENATEX ( _top1, dim_products[subcategory], ", " )
+		displayFolder: Dashboard
+		lineageTag: 68e135fa-895f-4423-b4b6-463e8ebc3298
+
+	/// Land med flest ordrer. Kunder uden land (n/a) tæller ikke med.
+	measure 'Top land' =
+			VAR _items = FILTER ( VALUES ( dim_customers[country] ), NOT ISBLANK ( dim_customers[country] ) && dim_customers[country] <> "n/a" )
+			VAR _top1 = TOPN ( 1, _items, [Antal ordrer], DESC )
+			RETURN
+			    CONCATENATEX ( _top1, dim_customers[country], ", " )
+		displayFolder: Dashboard
+		lineageTag: cc75a5c4-b94f-4b4f-9cc7-53623dd132af
+
+	column Kolonne
+		isHidden
+		lineageTag: f4e1d047-01a0-4828-9b88-bdfeb31d72c5
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Kolonne]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = calculated
+		mode: import
+		source = ROW ( "Kolonne", BLANK () )
+

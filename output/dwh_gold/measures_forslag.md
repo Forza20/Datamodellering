@@ -1,6 +1,6 @@
 # Measures – forslag til dwh_gold
 
-Status: **forslag, ikke tilføjet modellen.** Godkend eller ret, så lægger jeg dem i en `_measures`-tabel.
+Status: **tilføjet modellen** i tabellen `_Measures` (`tables/_Measures.tmdl`), 17 measures.
 
 ## Konventioner
 

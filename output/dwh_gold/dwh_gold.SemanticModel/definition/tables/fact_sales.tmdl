@@ -42,6 +42,7 @@ table fact_sales
 		sourceColumn: order_date
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation UnderlyingDateTimeDataType = Date
 
 	column shipping_date
@@ -53,6 +54,7 @@ table fact_sales
 		sourceColumn: shipping_date
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation UnderlyingDateTimeDataType = Date
 
 	column due_date
@@ -64,6 +66,7 @@ table fact_sales
 		sourceColumn: due_date
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation UnderlyingDateTimeDataType = Date
 
 	column sales_amount
@@ -109,3 +112,4 @@ table fact_sales
 					Typer
 
 	annotation PBI_ResultType = Table
+

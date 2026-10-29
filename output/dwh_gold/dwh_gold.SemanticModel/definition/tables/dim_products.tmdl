@@ -107,6 +107,7 @@ table dim_products
 		sourceColumn: start_date
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation UnderlyingDateTimeDataType = Date
 
 	partition dim_products = m
@@ -121,4 +122,5 @@ table dim_products
 				in
 					Typer
 
-	annotation PBI_ResultType = Table
+	annotation PBI_ResultType = Exception
+

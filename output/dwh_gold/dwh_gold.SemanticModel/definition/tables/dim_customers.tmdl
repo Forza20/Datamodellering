@@ -88,6 +88,7 @@ table dim_customers
 		sourceColumn: birthdate
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation UnderlyingDateTimeDataType = Date
 
 	column create_date
@@ -99,6 +100,7 @@ table dim_customers
 		sourceColumn: create_date
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation UnderlyingDateTimeDataType = Date
 
 	partition dim_customers = m
@@ -114,3 +116,4 @@ table dim_customers
 					Typer
 
 	annotation PBI_ResultType = Table
+

@@ -9,3 +9,14 @@ relationship 7e55ceaa-2d6c-4946-bd53-76cb24398d9f
 relationship e07b48b9-169a-4905-abac-001e241d6d66
 	fromColumn: fact_sales.order_date
 	toColumn: dim_date.date_key
+
+relationship fact_sales_shipping_date_dim_date
+	isActive: false
+	fromColumn: fact_sales.shipping_date
+	toColumn: dim_date.date_key
+
+relationship fact_sales_due_date_dim_date
+	isActive: false
+	fromColumn: fact_sales.due_date
+	toColumn: dim_date.date_key
+

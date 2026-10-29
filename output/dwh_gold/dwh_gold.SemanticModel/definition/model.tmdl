@@ -1,7 +1,7 @@
 model Model
 	culture: da-DK
 	defaultPowerBIDataSourceVersion: powerBI_V3
-	sourceQueryCulture: en-US
+	sourceQueryCulture: da-DK
 	dataAccessOptions
 		legacyRedirects
 		returnErrorValuesAsNull
@@ -18,11 +18,11 @@ annotation __PBI_TimeIntelligenceEnabled = 0
 
 annotation PBI_QueryOrder = ["PgServer","PgDatabase","GoldKilde","dim_customers","dim_products","fact_sales","dim_date"]
 
+annotation PBI_ProTooling = ["DevMode"]
+
 ref table dim_customers
 ref table dim_products
 ref table fact_sales
 ref table dim_date
+ref table _Measures
 
-ref expression PgServer
-ref expression PgDatabase
-ref expression GoldKilde
