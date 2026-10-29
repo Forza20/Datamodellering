@@ -1,5 +1,7 @@
 # Guide: dwh_gold – fra CSV til Power BI-dashboard
 
+*English version: [Guide_dwh_gold_en.md](Guide_dwh_gold_en.md)*
+
 Trin-for-trin-guide til datavarehuset `dwh_gold`: medallion-lagene i Supabase (bronze → silver → gold),
 Power BI-modellen i PBIP/TMDL og dashboardet "Salgsoverblik".
 
@@ -193,6 +195,7 @@ Der findes ingen returdata, så forlæggets "Return Rate" er erstattet af margin
 | Tabeller tomme i Power BI | RLS uden policy for `powerbi_reader` | Kør migration 6 |
 | *Property 'description' is unknown* | `///` foran en relation i TMDL | Fjern beskrivelsen |
 | Rapporten går ned med `customTheme` | Rapporten mangler tema | Tema ligger i `StaticResources/SharedResources/BaseThemes` |
+| KPI-fliser vises hvide | Kortets indre flise (`fillCustom`) tegnes oven på den mørke container | Sæt `fillCustom.transparency` til 100 |
 | Power BI åbner ikke / mærkelige fejl | Fuld disk | Frigør plads på C: (mindst et par GB) |
 
 ## 7. Opdatering af data
