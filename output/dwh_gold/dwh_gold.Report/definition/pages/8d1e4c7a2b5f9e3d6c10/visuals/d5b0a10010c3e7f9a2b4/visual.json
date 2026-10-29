@@ -41,11 +41,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Antal kunder"
+                  "Property": "Kunder hele måneder"
                 }
               },
-              "queryRef": "_Measures.Antal kunder",
-              "nativeQueryRef": "Antal kunder"
+              "queryRef": "_Measures.Kunder hele måneder",
+              "nativeQueryRef": "Kunder hele måneder"
             }
           ]
         }

@@ -99,6 +99,27 @@ table fact_sales
 
 		annotation SummarizationSetBy = User
 
+	/// Kostpris pr. stk. for den produktversion, der gjaldt på ordredatoen (beslutning R2-1).
+	column unit_cost
+		dataType: int64
+		formatString: #,##0
+		displayFolder: Beløb
+		lineageTag: b4646945-2524-4d3c-9d92-cc337ce75c35
+		summarizeBy: none
+		sourceColumn: unit_cost
+
+		annotation SummarizationSetBy = User
+
+	/// TRUE når ordredatoen er afledt i silver (beslutning R2-2).
+	column order_date_derived
+		dataType: boolean
+		displayFolder: Datoer
+		lineageTag: 64537014-8b16-44b4-9d66-856f9769e27c
+		summarizeBy: none
+		sourceColumn: order_date_derived
+
+		annotation SummarizationSetBy = Automatic
+
 	partition fact_sales = m
 		mode: import
 		queryGroup: Gold
@@ -106,8 +127,8 @@ table fact_sales
 				let
 					Kilde = GoldKilde,
 					Data = Kilde{[Schema = "gold", Item = "fact_sales"]}[Data],
-					Valgt = Table.SelectColumns(Data, {"order_number", "product_key", "customer_key", "order_date", "shipping_date", "due_date", "sales_amount", "quantity", "price"}),
-					Typer = Table.TransformColumnTypes(Valgt, {{"order_number", type text}, {"product_key", Int64.Type}, {"customer_key", Int64.Type}, {"order_date", type date}, {"shipping_date", type date}, {"due_date", type date}, {"sales_amount", Int64.Type}, {"quantity", Int64.Type}, {"price", Int64.Type}})
+					Valgt = Table.SelectColumns(Data, {"order_number", "product_key", "customer_key", "order_date", "shipping_date", "due_date", "sales_amount", "quantity", "price", "unit_cost", "order_date_derived"}),
+					Typer = Table.TransformColumnTypes(Valgt, {{"order_number", type text}, {"product_key", Int64.Type}, {"customer_key", Int64.Type}, {"order_date", type date}, {"shipping_date", type date}, {"due_date", type date}, {"sales_amount", Int64.Type}, {"quantity", Int64.Type}, {"price", Int64.Type}, {"unit_cost", Int64.Type}, {"order_date_derived", type logical}})
 				in
 					Typer
 

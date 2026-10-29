@@ -4,3 +4,6 @@
 # Power BI lokale filer
 **/.pbi/localSettings.json
 **/.pbi/cache.abf
+
+# Lokal MCP-konfiguration med projekt-id (skabelon: .mcp.example.json)
+.mcp.json

@@ -128,8 +128,8 @@ table _Measures
 		displayFolder: Tidsintelligens
 		lineageTag: ae80e193-b15c-4528-ab2d-2e6bcc6649c6
 
-	/// Kostpris = antal × kostpris pr. stk. fra dim_products.
-	measure Kostpris = SUMX ( fact_sales, fact_sales[quantity] * RELATED ( dim_products[cost] ) )
+	/// Kostpris = antal × kostpris pr. stk. på ordredatoen, gemt på salgslinjen (beslutning R2-1).
+	measure Kostpris = SUMX ( fact_sales, fact_sales[quantity] * fact_sales[unit_cost] )
 		formatString: #,##0
 		displayFolder: Salg
 		lineageTag: 3886e37a-1444-4a9a-8d5c-603ca4fbcb80
@@ -255,6 +255,22 @@ table _Measures
 			    CONCATENATEX ( _top1, dim_customers[country], ", " )
 		displayFolder: Dashboard
 		lineageTag: cc75a5c4-b94f-4b4f-9cc7-53623dd132af
+
+	/// Omsætning kun for hele måneder – til grafer over tid (beslutning R3-2). Totaler bruger [Omsætning].
+	measure 'Omsætning hele måneder' = CALCULATE ( [Omsætning], KEEPFILTERS ( dim_date[is_complete_month] = TRUE () ) )
+		formatString: #,##0
+		displayFolder: Dashboard
+		lineageTag: 869cd6c3-2678-4c0d-9b40-0c2f0c3c3cbc
+
+	measure 'Ordrer hele måneder' = CALCULATE ( [Antal ordrer], KEEPFILTERS ( dim_date[is_complete_month] = TRUE () ) )
+		formatString: #,##0
+		displayFolder: Dashboard
+		lineageTag: eadac64d-ecbf-494c-8cdb-c195c53890f9
+
+	measure 'Kunder hele måneder' = CALCULATE ( [Antal kunder], KEEPFILTERS ( dim_date[is_complete_month] = TRUE () ) )
+		formatString: #,##0
+		displayFolder: Dashboard
+		lineageTag: ff5327c4-450a-4a09-bcc2-f87b346f5e12
 
 	column Kolonne
 		isHidden

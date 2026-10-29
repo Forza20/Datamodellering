@@ -4,17 +4,18 @@
 
   Krav:
     - psql på PATH (fx PostgreSQL 16 client tools)
-    - Miljøvariabler: SUPABASE_DB_PASSWORD og SUPABASE_POOLER_HOST
-      (host står under Project Settings > Database > Connection pooling, fx aws-0-eu-central-1.pooler.supabase.com)
+    - Miljøvariabler: SUPABASE_DB_PASSWORD, SUPABASE_POOLER_HOST og SUPABASE_PROJECT_REF
+      (host står under Connect > Session pooler, fx aws-0-<region>.pooler.supabase.com)
 
   Brug:
     $env:SUPABASE_DB_PASSWORD = '...'      # sættes i sessionen, aldrig i filen
     $env:SUPABASE_POOLER_HOST = 'aws-0-<region>.pooler.supabase.com'
+    $env:SUPABASE_PROJECT_REF = '<project-ref>'
     .\scripts\load_bronze.ps1 -DatasetDir 'C:\sti\til\sql-data-warehouse-project\01_datasets'
 #>
 param(
     [Parameter(Mandatory)] [string] $DatasetDir,
-    [string] $ProjectRef = 'spihvuokluprvafmchvn',
+    [string] $ProjectRef = $env:SUPABASE_PROJECT_REF,
     [int]    $Port       = 5432,
     [string] $Database   = 'postgres'
 )
@@ -22,6 +23,7 @@ $ErrorActionPreference = 'Stop'
 
 if (-not $env:SUPABASE_DB_PASSWORD) { throw 'Miljøvariablen SUPABASE_DB_PASSWORD er ikke sat.' }
 if (-not $env:SUPABASE_POOLER_HOST) { throw 'Miljøvariablen SUPABASE_POOLER_HOST er ikke sat.' }
+if (-not $ProjectRef) { throw 'Angiv -ProjectRef eller sæt miljøvariablen SUPABASE_PROJECT_REF.' }
 
 $env:PGPASSWORD = $env:SUPABASE_DB_PASSWORD
 $env:PGHOST     = $env:SUPABASE_POOLER_HOST

@@ -41,11 +41,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Antal ordrer"
+                  "Property": "Ordrer hele måneder"
                 }
               },
-              "queryRef": "_Measures.Antal ordrer",
-              "nativeQueryRef": "Antal ordrer"
+              "queryRef": "_Measures.Ordrer hele måneder",
+              "nativeQueryRef": "Ordrer hele måneder"
             }
           ]
         }
