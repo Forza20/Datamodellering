@@ -4,3 +4,4 @@
 # Power BI lokale filer
 **/.pbi/localSettings.json
 **/.pbi/cache.abf
+.mcp.json
