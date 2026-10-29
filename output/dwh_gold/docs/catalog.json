@@ -1,6 +1,6 @@
 {
   "project": "dwh_gold",
-  "generated": "2026-10-29T20:32:29",
+  "generated": "2026-10-29T20:58:57",
   "slotsSource": "udledt af dashboard-siden",
   "tables": [
     {
@@ -21,7 +21,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "Ingen – measure-tabel i Power BI",
       "Status": "Fra model",
-      "Beskrivelseskilde": "TMDL"
+      "Beskrivelseskilde": "TMDL",
+      "Opstrøms kilde (auto)": "Ingen – measure-tabel i Power BI"
     },
     {
       "Nøgle": "dim_customers",
@@ -41,7 +42,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "gold.load_gold(): silver.crm_cust_info (CRM) + silver.erp_cust_az12 og silver.erp_loc_a101 (ERP, left join på cst_key = cid) ← bronze",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_cust_info, silver.erp_cust_az12, silver.erp_loc_a101 ← bronze.crm_cust_info, bronze.erp_cust_az12, bronze.erp_loc_a101"
     },
     {
       "Nøgle": "dim_date",
@@ -61,7 +63,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "Genereres i Power Query ud fra datoerne i fact_sales (ingen tabel i Supabase)",
       "Status": "Fra model",
-      "Beskrivelseskilde": "TMDL"
+      "Beskrivelseskilde": "TMDL",
+      "Opstrøms kilde (auto)": "Genereret i Power Query ud fra fact_sales"
     },
     {
       "Nøgle": "dim_products",
@@ -81,7 +84,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "gold.load_gold(): silver.crm_prd_info (CRM) + silver.erp_px_cat_g1v2 (ERP, left join på cat_id = id), kun aktuelle produkter (prd_end_dt is null) ← bronze",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_prd_info, silver.erp_px_cat_g1v2 ← bronze.crm_prd_info, bronze.erp_px_cat_g1v2 (filter: pn.prd_end_dt is null)"
     },
     {
       "Nøgle": "fact_sales",
@@ -101,7 +105,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "gold.load_gold(): silver.crm_sales_details (CRM) + opslag i gold.dim_products og gold.dim_customers ← bronze.crm_sales_details",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "gold.dim_customers, gold.dim_products, silver.crm_sales_details ← bronze.crm_sales_details"
     }
   ],
   "columns": [
@@ -127,7 +132,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "Surrogatnøgle i gold: row_number() over cst_id",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_cust_info.cst_id (afledt: row_number() over (order by ci.cst_id)) ← bronze.crm_cust_info.cst_id"
     },
     {
       "Nøgle": "dim_customers[customer_id]",
@@ -151,7 +157,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_cust_info.cst_id ← bronze.crm_cust_info (nyeste række pr. kunde)",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_cust_info.cst_id ← bronze.crm_cust_info.cst_id"
     },
     {
       "Nøgle": "dim_customers[customer_number]",
@@ -175,7 +182,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_cust_info.cst_key ← bronze.crm_cust_info",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_cust_info.cst_key ← bronze.crm_cust_info.cst_key"
     },
     {
       "Nøgle": "dim_customers[first_name]",
@@ -199,7 +207,8 @@
       "Følsomhed": "Mulig PII - vurdér",
       "Opstrøms kilde": "silver.crm_cust_info.cst_firstname (trimmet) ← bronze.crm_cust_info",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_cust_info.cst_firstname ← bronze.crm_cust_info.cst_firstname (afledt: trim(cst_firstname))"
     },
     {
       "Nøgle": "dim_customers[last_name]",
@@ -223,7 +232,8 @@
       "Følsomhed": "Mulig PII - vurdér",
       "Opstrøms kilde": "silver.crm_cust_info.cst_lastname (trimmet) ← bronze.crm_cust_info",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_cust_info.cst_lastname ← bronze.crm_cust_info.cst_lastname (afledt: trim(cst_lastname))"
     },
     {
       "Nøgle": "dim_customers[country]",
@@ -247,7 +257,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.erp_loc_a101.cntry (DE→Germany, US/USA→United States, tom→n/a) ← bronze.erp_loc_a101",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.erp_loc_a101.cntry ← bronze.erp_loc_a101.cntry (afledt: case when trim(cntry) = 'DE' then 'Germany' when trim(cntry) in ('US', 'USA') t…)"
     },
     {
       "Nøgle": "dim_customers[marital_status]",
@@ -271,7 +282,8 @@
       "Følsomhed": "Mulig PII - vurdér",
       "Opstrøms kilde": "silver.crm_cust_info.cst_marital_status (S/M→Single/Married) ← bronze.crm_cust_info",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_cust_info.cst_marital_status ← bronze.crm_cust_info.cst_marital_status (afledt: case when upper(trim(cst_marital_status)) = 'S' then 'Single' when upper(trim(c…)"
     },
     {
       "Nøgle": "dim_customers[gender]",
@@ -295,7 +307,8 @@
       "Følsomhed": "Mulig PII - vurdér",
       "Opstrøms kilde": "silver.crm_cust_info.cst_gndr; hvis n/a: silver.erp_cust_az12.gen ← bronze (CRM primær, ERP fallback)",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_cust_info.cst_gndr + silver.erp_cust_az12.gen (afledt: case when ci.cst_gndr != 'n/a' then ci.cst_gndr else coalesce(ca.gen, 'n/a') end) ← bronze.crm_cust_info.cst_gndr + bronze.erp_cust_az12.gen (afledt: case when upper(trim(cst_gndr)) = 'F' then 'Female' when upper(trim(cst_gndr)) …; case when upper(trim(gen)) in ('F', 'FEMALE') then 'Female' when upper(trim(gen…)"
     },
     {
       "Nøgle": "dim_customers[birthdate]",
@@ -319,7 +332,8 @@
       "Følsomhed": "Mulig PII - vurdér",
       "Opstrøms kilde": "silver.erp_cust_az12.bdate (fremtidige datoer→NULL) ← bronze.erp_cust_az12",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.erp_cust_az12.bdate ← bronze.erp_cust_az12.bdate (afledt: case when bdate > now() then null else bdate end)"
     },
     {
       "Nøgle": "dim_customers[create_date]",
@@ -343,7 +357,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_cust_info.cst_create_date ← bronze.crm_cust_info",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_cust_info.cst_create_date ← bronze.crm_cust_info.cst_create_date"
     },
     {
       "Nøgle": "dim_date[date_key]",
@@ -367,7 +382,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "Genereret i Power Query (dim_date)"
     },
     {
       "Nøgle": "dim_date[year]",
@@ -391,7 +407,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "Beregnet i Power Query (dim_date): each Date.Year([date_key])"
     },
     {
       "Nøgle": "dim_date[quarter]",
@@ -415,7 +432,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "Beregnet i Power Query (dim_date): each \"K\" & Text.From(Date.QuarterOfYear([date_key]))"
     },
     {
       "Nøgle": "dim_date[month_no]",
@@ -439,7 +457,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "Beregnet i Power Query (dim_date): each Date.Month([date_key])"
     },
     {
       "Nøgle": "dim_date[month_name]",
@@ -463,7 +482,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "Beregnet i Power Query (dim_date): each Date.ToText([date_key], [Format = \"MMM\", Culture = \"da-DK\"])"
     },
     {
       "Nøgle": "dim_date[year_month]",
@@ -487,7 +507,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "Beregnet i Power Query (dim_date): each Date.ToText([date_key], [Format = \"yyyy-MM\"])"
     },
     {
       "Nøgle": "dim_date[month_start]",
@@ -511,7 +532,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "Beregnet i Power Query (dim_date): each Date.StartOfMonth([date_key])"
     },
     {
       "Nøgle": "dim_date[week_no]",
@@ -535,7 +557,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "Beregnet i Power Query (dim_date): each Date.WeekOfYear([date_key], Day.Monday)"
     },
     {
       "Nøgle": "dim_date[day_of_week_no]",
@@ -559,7 +582,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "Beregnet i Power Query (dim_date): each Date.DayOfWeek([date_key], Day.Monday) + 1"
     },
     {
       "Nøgle": "dim_date[day_name]",
@@ -583,7 +607,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "Genereres i Power Query (ingen kilde i Supabase)",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "Beregnet i Power Query (dim_date): each Date.ToText([date_key], [Format = \"ddd\", Culture = \"da-DK\"])"
     },
     {
       "Nøgle": "dim_products[product_key]",
@@ -607,7 +632,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "Surrogatnøgle i gold: row_number() over prd_start_dt, prd_key",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_prd_info.prd_start_dt + silver.crm_prd_info.prd_key (afledt: row_number() over (order by pn.prd_start_dt, pn.prd_key)) ← bronze.crm_prd_info.prd_start_dt + bronze.crm_prd_info.prd_key (afledt: prd_start_dt::date; substring(prd_key from 7))"
     },
     {
       "Nøgle": "dim_products[product_id]",
@@ -631,7 +657,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_prd_info.prd_id ← bronze.crm_prd_info",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_prd_info.prd_id ← bronze.crm_prd_info.prd_id"
     },
     {
       "Nøgle": "dim_products[product_number]",
@@ -655,7 +682,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_prd_info.prd_key (prd_key fra tegn 7) ← bronze.crm_prd_info",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_prd_info.prd_key ← bronze.crm_prd_info.prd_key (afledt: substring(prd_key from 7))"
     },
     {
       "Nøgle": "dim_products[product_name]",
@@ -679,7 +707,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_prd_info.prd_nm ← bronze.crm_prd_info",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_prd_info.prd_nm ← bronze.crm_prd_info.prd_nm"
     },
     {
       "Nøgle": "dim_products[category_id]",
@@ -703,7 +732,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_prd_info.cat_id (første 5 tegn af prd_key, - → _) ← bronze.crm_prd_info",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_prd_info.cat_id ← bronze.crm_prd_info.prd_key (afledt: replace(substring(prd_key from 1 for 5), '-', '_'))"
     },
     {
       "Nøgle": "dim_products[category]",
@@ -727,7 +757,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.erp_px_cat_g1v2.cat ← bronze.erp_px_cat_g1v2",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.erp_px_cat_g1v2.cat ← bronze.erp_px_cat_g1v2.cat"
     },
     {
       "Nøgle": "dim_products[subcategory]",
@@ -751,7 +782,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.erp_px_cat_g1v2.subcat ← bronze.erp_px_cat_g1v2",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.erp_px_cat_g1v2.subcat ← bronze.erp_px_cat_g1v2.subcat"
     },
     {
       "Nøgle": "dim_products[maintenance]",
@@ -775,7 +807,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.erp_px_cat_g1v2.maintenance ← bronze.erp_px_cat_g1v2",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.erp_px_cat_g1v2.maintenance ← bronze.erp_px_cat_g1v2.maintenance"
     },
     {
       "Nøgle": "dim_products[cost]",
@@ -799,7 +832,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_prd_info.prd_cost (NULL→0) ← bronze.crm_prd_info",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_prd_info.prd_cost ← bronze.crm_prd_info.prd_cost (afledt: coalesce(prd_cost, 0))"
     },
     {
       "Nøgle": "dim_products[product_line]",
@@ -823,7 +857,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_prd_info.prd_line (M/R/S/T→Mountain/Road/Other Sales/Touring) ← bronze.crm_prd_info",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_prd_info.prd_line ← bronze.crm_prd_info.prd_line (afledt: case when upper(trim(prd_line)) = 'M' then 'Mountain' when upper(trim(prd_line)…)"
     },
     {
       "Nøgle": "dim_products[start_date]",
@@ -847,7 +882,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_prd_info.prd_start_dt ← bronze.crm_prd_info",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_prd_info.prd_start_dt ← bronze.crm_prd_info.prd_start_dt (afledt: prd_start_dt::date)"
     },
     {
       "Nøgle": "fact_sales[order_number]",
@@ -871,7 +907,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_sales_details.sls_ord_num ← bronze.crm_sales_details",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_sales_details.sls_ord_num ← bronze.crm_sales_details.sls_ord_num"
     },
     {
       "Nøgle": "fact_sales[product_key]",
@@ -895,7 +932,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "gold.dim_products.product_key via sls_prd_key = product_number",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "gold.dim_products.product_key ← silver.crm_prd_info.prd_start_dt + silver.crm_prd_info.prd_key (afledt: row_number() over (order by pn.prd_start_dt, pn.prd_key)) ← bronze.crm_prd_info.prd_start_dt + bronze.crm_prd_info.prd_key (afledt: prd_start_dt::date; substring(prd_key from 7))"
     },
     {
       "Nøgle": "fact_sales[customer_key]",
@@ -919,7 +957,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "gold.dim_customers.customer_key via sls_cust_id = customer_id",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "gold.dim_customers.customer_key ← silver.crm_cust_info.cst_id (afledt: row_number() over (order by ci.cst_id)) ← bronze.crm_cust_info.cst_id"
     },
     {
       "Nøgle": "fact_sales[order_date]",
@@ -943,7 +982,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_sales_details.sls_order_dt (ugyldig yyyymmdd→NULL) ← bronze.crm_sales_details",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_sales_details.sls_order_dt ← bronze.crm_sales_details.sls_order_dt (afledt: case when sls_order_dt = 0 or length(sls_order_dt::text) != 8 then null else sl…)"
     },
     {
       "Nøgle": "fact_sales[shipping_date]",
@@ -967,7 +1007,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_sales_details.sls_ship_dt (ugyldig yyyymmdd→NULL) ← bronze.crm_sales_details",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_sales_details.sls_ship_dt ← bronze.crm_sales_details.sls_ship_dt (afledt: case when sls_ship_dt = 0 or length(sls_ship_dt::text) != 8 then null else sls_…)"
     },
     {
       "Nøgle": "fact_sales[due_date]",
@@ -991,7 +1032,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_sales_details.sls_due_dt (ugyldig yyyymmdd→NULL) ← bronze.crm_sales_details",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_sales_details.sls_due_dt ← bronze.crm_sales_details.sls_due_dt (afledt: case when sls_due_dt = 0 or length(sls_due_dt::text) != 8 then null else sls_du…)"
     },
     {
       "Nøgle": "fact_sales[sales_amount]",
@@ -1015,7 +1057,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_sales_details.sls_sales (genberegnet som antal × |pris| hvis ugyldig) ← bronze.crm_sales_details",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_sales_details.sls_sales ← bronze.crm_sales_details.sls_sales + bronze.crm_sales_details.sls_quantity + bronze.crm_sales_details.sls_price (afledt: case when sls_sales is null or sls_sales <= 0 or sls_sales != sls_quantity * ab…)"
     },
     {
       "Nøgle": "fact_sales[quantity]",
@@ -1039,7 +1082,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_sales_details.sls_quantity ← bronze.crm_sales_details",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_sales_details.sls_quantity ← bronze.crm_sales_details.sls_quantity"
     },
     {
       "Nøgle": "fact_sales[price]",
@@ -1063,7 +1107,8 @@
       "Følsomhed": "",
       "Opstrøms kilde": "silver.crm_sales_details.sls_price (salg/antal hvis ugyldig) ← bronze.crm_sales_details",
       "Status": "Godkendt",
-      "Beskrivelseskilde": "Excel"
+      "Beskrivelseskilde": "Excel",
+      "Opstrøms kilde (auto)": "silver.crm_sales_details.sls_price ← bronze.crm_sales_details.sls_price + bronze.crm_sales_details.sls_sales + bronze.crm_sales_details.sls_quantity (afledt: case when sls_price is null or sls_price <= 0 then sls_sales / nullif(sls_quant…)"
     }
   ],
   "measures": [
