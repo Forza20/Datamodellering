@@ -8,26 +8,31 @@ table _Measures
 		displayFolder: Salg
 		lineageTag: 9846e0f2-7d3b-4506-b213-b7086c091768
 
+	/// Antal unikke ordrer (distinkte ordrenumre) i den aktuelle filterkontekst. Hovedtal på KPI 2, Månedskort 2, kategorisøjlerne og top 10-tabellen.
 	measure 'Antal ordrer' = DISTINCTCOUNT ( fact_sales[order_number] )
 		formatString: #,##0
 		displayFolder: Salg
 		lineageTag: 9e5118ea-df49-450b-ade7-e9bed1266289
 
+	/// Antal ordrelinjer, dvs. rækker i fact_sales. En ordre kan have flere linjer.
 	measure 'Antal ordrelinjer' = COUNTROWS ( fact_sales )
 		formatString: #,##0
 		displayFolder: Salg
 		lineageTag: d0ee150b-a1c8-41b2-b015-eb9cd46f8e5e
 
+	/// Samlet antal solgte enheder (sum af quantity).
 	measure 'Antal enheder' = SUM ( fact_sales[quantity] )
 		formatString: #,##0
 		displayFolder: Salg
 		lineageTag: 14826268-d893-4aeb-926b-f35ddaa3bd3d
 
+	/// Gennemsnitlig omsætning pr. ordrelinje: Omsætning divideret med antal ordrelinjer.
 	measure 'Gns. ordrelinje' = DIVIDE ( [Omsætning], [Antal ordrelinjer] )
 		formatString: #,##0.00
 		displayFolder: Salg
 		lineageTag: 5de08586-3e85-4714-9d28-f53ad45eda54
 
+	/// Gennemsnitlig ordreværdi: Omsætning divideret med antal unikke ordrer.
 	measure 'Gns. ordreværdi' = DIVIDE ( [Omsætning], [Antal ordrer] )
 		formatString: #,##0.00
 		displayFolder: Salg
@@ -39,21 +44,25 @@ table _Measures
 		displayFolder: Kunder
 		lineageTag: fbd33cff-34b2-4901-a074-1e5b7a5152cb
 
+	/// Gennemsnitlig omsætning pr. kunde med salg i perioden: Omsætning divideret med antal kunder.
 	measure 'Omsætning pr. kunde' = DIVIDE ( [Omsætning], [Antal kunder] )
 		formatString: #,##0.00
 		displayFolder: Kunder
 		lineageTag: 105a40bb-4fc9-4367-abfe-ba9502f0a603
 
+	/// Omsætning år-til-dato, akkumuleret fra 1. januar til den sidste dato i filterkonteksten.
 	measure 'Omsætning YTD' = TOTALYTD ( [Omsætning], dim_date[date_key] )
 		formatString: #,##0
 		displayFolder: Tidsintelligens
 		lineageTag: 12e7e5bf-0508-4a60-97e1-4f39bfffc963
 
+	/// Omsætning i samme periode året før (SAMEPERIODLASTYEAR på dim_date).
 	measure 'Omsætning sidste år' = CALCULATE ( [Omsætning], SAMEPERIODLASTYEAR ( dim_date[date_key] ) )
 		formatString: #,##0
 		displayFolder: Tidsintelligens
 		lineageTag: 6c67473e-7a8f-484c-8fa0-5ae4061be29f
 
+	/// Ændring i omsætning i forhold til samme periode sidste år, i kroner. Blank hvis et af årene mangler data.
 	measure 'Omsætning YoY' =
 			VAR _aar = [Omsætning]
 			VAR _sidsteAar = [Omsætning sidste år]
@@ -63,6 +72,7 @@ table _Measures
 		displayFolder: Tidsintelligens
 		lineageTag: c8a7c2b0-dde9-4fab-94b1-44bfe405e6c7
 
+	/// Procentvis ændring i omsætning i forhold til samme periode sidste år.
 	measure 'Omsætning YoY %' =
 			VAR _sidsteAar = [Omsætning sidste år]
 			RETURN
@@ -71,11 +81,13 @@ table _Measures
 		displayFolder: Tidsintelligens
 		lineageTag: 78e20c91-d0a9-4c3a-b8ec-c3ffb8350dd7
 
+	/// Omsætning år-til-dato for samme periode året før.
 	measure 'Omsætning YTD sidste år' = CALCULATE ( [Omsætning YTD], SAMEPERIODLASTYEAR ( dim_date[date_key] ) )
 		formatString: #,##0
 		displayFolder: Tidsintelligens
 		lineageTag: f6bbd411-fc63-47ef-999b-0c81727f81a2
 
+	/// Procentvis ændring i omsætning år-til-dato i forhold til samme periode sidste år.
 	measure 'Omsætning YTD YoY %' =
 			VAR _ytd = [Omsætning YTD]
 			VAR _ytdSidsteAar = [Omsætning YTD sidste år]
@@ -95,6 +107,7 @@ table _Measures
 		displayFolder: Rangering
 		lineageTag: ab35e97e-e1eb-4798-bf0f-1adba105c5c3
 
+	/// Omsætning begrænset til de 10 produkter med højest omsætning blandt de valgte produkter.
 	measure 'Omsætning top 10 produkter' =
 			VAR _top =
 			    TOPN ( 10, ALLSELECTED ( dim_products[product_name] ), [Omsætning], DESC )
@@ -134,11 +147,13 @@ table _Measures
 		displayFolder: Salg
 		lineageTag: 3886e37a-1444-4a9a-8d5c-603ca4fbcb80
 
+	/// Omsætning minus kostpris (antal × kostpris pr. stk.). Vises på KPI 3.
 	measure Dækningsbidrag = [Omsætning] - [Kostpris]
 		formatString: #,##0
 		displayFolder: Salg
 		lineageTag: 5a081247-e204-4b45-abe3-90209ee63356
 
+	/// Dækningsbidrag i procent af omsætningen. Vises på KPI 4 og som farvegradient i top 10-tabellen.
 	measure 'Margin %' = DIVIDE ( [Dækningsbidrag], [Omsætning] )
 		formatString: 0.0%
 		displayFolder: Salg
@@ -154,6 +169,7 @@ table _Measures
 		displayFolder: Dashboard
 		lineageTag: a8f6c93c-c81f-4f94-b4c6-72ae3a85ce8b
 
+	/// Omsætning i seneste hele måned med salg (delvis måned springes over), uanset datofilter. Vises på Månedskort 1.
 	measure 'Omsætning seneste måned' =
 			VAR _slut = [Seneste hele måned slut]
 			RETURN
@@ -162,6 +178,7 @@ table _Measures
 		displayFolder: Dashboard
 		lineageTag: 95f6fe6a-b8d7-4418-8aa0-0115be0bf723
 
+	/// Omsætning i måneden før seneste hele måned. Bruges til sammenligning på Månedskort 1.
 	measure 'Omsætning forrige måned' =
 			VAR _slut = [Seneste hele måned slut]
 			RETURN
@@ -170,6 +187,7 @@ table _Measures
 		displayFolder: Dashboard
 		lineageTag: 5ec93c62-f7a8-4b50-934f-8e0c1512f948
 
+	/// Tekst til Månedskort 1: forrige måneds omsætning og procentvis ændring til seneste hele måned.
 	measure 'Omsætning måned label' =
 			VAR _cm = [Omsætning seneste måned]
 			VAR _pm = [Omsætning forrige måned]
@@ -178,10 +196,12 @@ table _Measures
 		displayFolder: Dashboard
 		lineageTag: 8d58ef27-b249-48c3-9b69-257e559523f7
 
+	/// Farvekode til Månedskort 1: rød (#D64550) hvis omsætningen faldt fra forrige måned, ellers mørk tekstfarve.
 	measure 'Omsætning måned farve' = IF ( [Omsætning seneste måned] < [Omsætning forrige måned], "#D64550", "#252423" )
 		displayFolder: Dashboard
 		lineageTag: 42946535-49f3-4dcb-99f7-b23ffb5db3e6
 
+	/// Antal unikke ordrer i seneste hele måned med salg, uanset datofilter. Vises på Månedskort 2.
 	measure 'Ordrer seneste måned' =
 			VAR _slut = [Seneste hele måned slut]
 			RETURN
@@ -190,6 +210,7 @@ table _Measures
 		displayFolder: Dashboard
 		lineageTag: 829854bf-c8e7-415a-9b55-fc85f59c57d6
 
+	/// Antal unikke ordrer i måneden før seneste hele måned. Bruges til sammenligning på Månedskort 2.
 	measure 'Ordrer forrige måned' =
 			VAR _slut = [Seneste hele måned slut]
 			RETURN
@@ -198,6 +219,7 @@ table _Measures
 		displayFolder: Dashboard
 		lineageTag: 7975e2e5-7589-4c9f-b004-8f5068bbc738
 
+	/// Tekst til Månedskort 2: forrige måneds antal ordrer og procentvis ændring til seneste hele måned.
 	measure 'Ordrer måned label' =
 			VAR _cm = [Ordrer seneste måned]
 			VAR _pm = [Ordrer forrige måned]
@@ -206,10 +228,12 @@ table _Measures
 		displayFolder: Dashboard
 		lineageTag: 9b9b5f1c-552e-4891-aca3-852337e993c2
 
+	/// Farvekode til Månedskort 2: rød (#D64550) hvis antal ordrer faldt fra forrige måned, ellers mørk tekstfarve.
 	measure 'Ordrer måned farve' = IF ( [Ordrer seneste måned] < [Ordrer forrige måned], "#D64550", "#252423" )
 		displayFolder: Dashboard
 		lineageTag: 998e80f6-221e-4561-a01e-b478427fc937
 
+	/// Antal kunder med salg i seneste hele måned, uanset datofilter. Vises på Månedskort 3.
 	measure 'Kunder seneste måned' =
 			VAR _slut = [Seneste hele måned slut]
 			RETURN
@@ -218,6 +242,7 @@ table _Measures
 		displayFolder: Dashboard
 		lineageTag: c565147e-de0f-4674-9dab-6f022411af93
 
+	/// Antal kunder med salg i måneden før seneste hele måned. Bruges til sammenligning på Månedskort 3.
 	measure 'Kunder forrige måned' =
 			VAR _slut = [Seneste hele måned slut]
 			RETURN
@@ -226,6 +251,7 @@ table _Measures
 		displayFolder: Dashboard
 		lineageTag: a223f05e-cf09-4107-839d-bdd2d0c8b1c1
 
+	/// Tekst til Månedskort 3: forrige måneds antal kunder og procentvis ændring til seneste hele måned.
 	measure 'Kunder måned label' =
 			VAR _cm = [Kunder seneste måned]
 			VAR _pm = [Kunder forrige måned]
@@ -234,6 +260,7 @@ table _Measures
 		displayFolder: Dashboard
 		lineageTag: ed1e7908-1583-4d28-b87f-caa5e6d58ab1
 
+	/// Farvekode til Månedskort 3: rød (#D64550) hvis antal kunder faldt fra forrige måned, ellers mørk tekstfarve.
 	measure 'Kunder måned farve' = IF ( [Kunder seneste måned] < [Kunder forrige måned], "#D64550", "#252423" )
 		displayFolder: Dashboard
 		lineageTag: f519d5b9-e262-4eee-928e-cb4d7e0cef72

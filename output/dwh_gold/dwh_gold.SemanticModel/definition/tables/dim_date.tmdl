@@ -3,6 +3,7 @@ table dim_date
 	lineageTag: 8588ac66-a501-4296-90e1-51352f08dc93
 	dataCategory: Time
 
+	/// Dato (én række pr. dag). Nøgle til fact_sales: aktiv relation på ordredato og inaktive relationer på afsendelses- og forfaldsdato.
 	column date_key
 		dataType: dateTime
 		isKey
@@ -15,6 +16,7 @@ table dim_date
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Kalenderår.
 	column year
 		dataType: int64
 		formatString: 0
@@ -25,6 +27,7 @@ table dim_date
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kvartal som tekst, fx K1–K4.
 	column quarter
 		dataType: string
 		displayFolder: År
@@ -34,6 +37,7 @@ table dim_date
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Månedsnummer 1–12. Bruges til sortering af månedsnavne.
 	column month_no
 		dataType: int64
 		isHidden
@@ -45,6 +49,7 @@ table dim_date
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Forkortet dansk månedsnavn (fx jan, feb).
 	column month_name
 		dataType: string
 		displayFolder: Måned
@@ -55,6 +60,7 @@ table dim_date
 
 		annotation SummarizationSetBy = Automatic
 
+	/// År og måned som tekst i formatet yyyy-MM.
 	column year_month
 		dataType: string
 		displayFolder: Måned
@@ -64,6 +70,7 @@ table dim_date
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Første dag i måneden. Månedsakse på trendgrafen og månedskortene.
 	column month_start
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -76,6 +83,7 @@ table dim_date
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Ugenummer med mandag som første ugedag.
 	column week_no
 		dataType: int64
 		formatString: 0
@@ -86,6 +94,7 @@ table dim_date
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Ugedagsnummer 1–7, hvor mandag er 1. Bruges til sortering af ugedage.
 	column day_of_week_no
 		dataType: int64
 		isHidden
@@ -97,6 +106,7 @@ table dim_date
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Forkortet dansk ugedagsnavn (fx man, tir).
 	column day_name
 		dataType: string
 		displayFolder: Uge

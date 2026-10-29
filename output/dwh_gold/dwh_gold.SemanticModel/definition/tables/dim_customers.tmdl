@@ -1,6 +1,8 @@
+/// Kundedimension med én række pr. kunde, hentet fra gold.dim_customers i Supabase.
 table dim_customers
 	lineageTag: f04f5b88-cb60-4099-bca5-5061a3f8cf4b
 
+	/// Surrogatnøgle for kunden. Relation til fact_sales[customer_key].
 	column customer_key
 		dataType: int64
 		isHidden
@@ -13,6 +15,7 @@ table dim_customers
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundens id i kildesystemet.
 	column customer_id
 		dataType: int64
 		isHidden
@@ -24,6 +27,7 @@ table dim_customers
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundenummer fra kildesystemet (forretningsnøgle).
 	column customer_number
 		dataType: string
 		displayFolder: Kunde
@@ -33,6 +37,7 @@ table dim_customers
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundens fornavn.
 	column first_name
 		dataType: string
 		displayFolder: Kunde
@@ -42,6 +47,7 @@ table dim_customers
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundens efternavn.
 	column last_name
 		dataType: string
 		displayFolder: Kunde
@@ -51,6 +57,7 @@ table dim_customers
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundens land. Bruges til fremhævningen af top-land på dashboardet.
 	column country
 		dataType: string
 		displayFolder: Geografi
@@ -61,6 +68,7 @@ table dim_customers
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundens civilstand.
 	column marital_status
 		dataType: string
 		displayFolder: Demografi
@@ -70,6 +78,7 @@ table dim_customers
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundens køn.
 	column gender
 		dataType: string
 		displayFolder: Demografi
@@ -79,6 +88,7 @@ table dim_customers
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kundens fødselsdato.
 	column birthdate
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -91,6 +101,7 @@ table dim_customers
 
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Dato hvor kunden blev oprettet i kildesystemet.
 	column create_date
 		dataType: dateTime
 		formatString: yyyy-mm-dd

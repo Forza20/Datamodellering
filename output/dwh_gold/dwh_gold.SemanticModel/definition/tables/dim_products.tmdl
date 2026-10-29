@@ -1,6 +1,8 @@
+/// Produktdimension med én række pr. produkt inkl. kategori, underkategori og kostpris, hentet fra gold.dim_products i Supabase.
 table dim_products
 	lineageTag: 51d88a54-e8d3-49ba-b170-cf8afd7797bd
 
+	/// Surrogatnøgle for produktet. Relation til fact_sales[product_key].
 	column product_key
 		dataType: int64
 		isHidden
@@ -13,6 +15,7 @@ table dim_products
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Produktets id i kildesystemet.
 	column product_id
 		dataType: int64
 		isHidden
@@ -24,6 +27,7 @@ table dim_products
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Produktnummer fra kildesystemet (forretningsnøgle).
 	column product_number
 		dataType: string
 		displayFolder: Produkt
@@ -33,6 +37,7 @@ table dim_products
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Produktnavn. Rækker i top 10-tabellen på dashboardet.
 	column product_name
 		dataType: string
 		displayFolder: Produkt
@@ -42,6 +47,7 @@ table dim_products
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Id for produktkategorien.
 	column category_id
 		dataType: string
 		isHidden
@@ -52,6 +58,7 @@ table dim_products
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Produktkategori. Akse på søjlediagrammet over ordrer pr. kategori.
 	column category
 		dataType: string
 		displayFolder: Kategori
@@ -61,6 +68,7 @@ table dim_products
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Produktunderkategori. Bruges til fremhævningen af top-underkategori på dashboardet.
 	column subcategory
 		dataType: string
 		displayFolder: Kategori
@@ -70,6 +78,7 @@ table dim_products
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Angiver om produktet kræver vedligeholdelse.
 	column maintenance
 		dataType: string
 		displayFolder: Produkt
@@ -79,6 +88,7 @@ table dim_products
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kostpris pr. stk. Bruges i Kostpris, Dækningsbidrag og Margin %.
 	column cost
 		dataType: int64
 		formatString: #,##0
@@ -89,6 +99,7 @@ table dim_products
 
 		annotation SummarizationSetBy = User
 
+	/// Produktlinje.
 	column product_line
 		dataType: string
 		displayFolder: Kategori
@@ -98,6 +109,7 @@ table dim_products
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Dato hvor produktet blev sat i salg.
 	column start_date
 		dataType: dateTime
 		formatString: yyyy-mm-dd
