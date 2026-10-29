@@ -26,21 +26,5 @@ from gold.fact_sales f
 left join gold.dim_products p on p.product_key = f.product_key
 where p.product_key is null
 union all
-select 'fact_sales: NULL order_date (forventet 0 efter afledning, R2-2)', count(*)
-from gold.fact_sales where order_date is null
-union all
-select 'fact_sales: NULL unit_cost (forventet 0, R2-1)', count(*)
-from gold.fact_sales where unit_cost is null;
-
--- Informations-tjek (ikke fejl, men skal kendes – se docs/model-decisions.md)
-select 'info: afledte ordredatoer (R2-2)' as check_name, count(*) as raekker
-from gold.fact_sales where order_date_derived
-union all
-select 'info: køn forskelligt i CRM og ERP – CRM vinder (R2-3)', count(*)
-from silver.crm_cust_info c
-join silver.erp_cust_az12 e on e.cid = c.cst_key
-where c.cst_gndr <> 'n/a' and e.gen <> 'n/a' and c.cst_gndr <> e.gen
-union all
-select 'info: salgslinjer hvor kostpris på ordredato <> nuværende kostpris (R2-1)', count(*)
-from gold.fact_sales f join gold.dim_products p using (product_key)
-where f.unit_cost <> p.cost;
+select 'fact_sales: NULL order_date (info: ugyldige kildedatoer)', count(*)
+from gold.fact_sales where order_date is null;

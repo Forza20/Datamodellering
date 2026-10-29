@@ -349,7 +349,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Ordrer med kategorien'"
+                  "Value": "'Ordrer pr. kategori'"
                 }
               }
             },

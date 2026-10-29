@@ -107,16 +107,6 @@ table dim_date
 
 		annotation SummarizationSetBy = Automatic
 
-	/// TRUE når hele måneden ligger inden for data (beslutning R3-2). Bruges til grafer over tid.
-	column is_complete_month
-		dataType: boolean
-		displayFolder: Måned
-		lineageTag: fbde0cc5-44ae-4ebe-947a-62c98b4f70f0
-		summarizeBy: none
-		sourceColumn: is_complete_month
-
-		annotation SummarizationSetBy = Automatic
-
 	partition dim_date = m
 		mode: import
 		queryGroup: Gold
@@ -135,12 +125,9 @@ table dim_date
 					Maanedstart = Table.AddColumn(AarMaaned, "month_start", each Date.StartOfMonth([date_key]), type date),
 					Uge = Table.AddColumn(Maanedstart, "week_no", each Date.WeekOfYear([date_key], Day.Monday), Int64.Type),
 					UgedagNr = Table.AddColumn(Uge, "day_of_week_no", each Date.DayOfWeek([date_key], Day.Monday) + 1, Int64.Type),
-					Ugedag = Table.AddColumn(UgedagNr, "day_name", each Date.ToText([date_key], [Format = "ddd", Culture = "da-DK"]), type text),
-					DataStart = List.Min(List.RemoveNulls(fact_sales[order_date])),
-					DataSlut = List.Max(List.RemoveNulls(fact_sales[order_date])),
-					HelMaaned = Table.AddColumn(Ugedag, "is_complete_month", each Date.StartOfMonth([date_key]) >= DataStart and Date.EndOfMonth([date_key]) <= DataSlut, type logical)
+					Ugedag = Table.AddColumn(UgedagNr, "day_name", each Date.ToText([date_key], [Format = "ddd", Culture = "da-DK"]), type text)
 				in
-					HelMaaned
+					Ugedag
 
 	annotation PBI_ResultType = Table
 

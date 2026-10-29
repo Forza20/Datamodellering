@@ -43,7 +43,7 @@
               },
               "queryRef": "_Measures.Antal ordrer",
               "nativeQueryRef": "Antal ordrer",
-              "displayName": "Ordrer med produktet"
+              "displayName": "Ordrer"
             },
             {
               "field": {

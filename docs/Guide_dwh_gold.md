@@ -1,8 +1,6 @@
 # Guide: dwh_gold – fra CSV til Power BI-dashboard
 
-*English version: [Guide_dwh_gold_en.md](Guide_dwh_gold_en.md) · Modelbeslutninger: [model-decisions.md](model-decisions.md)*
-
-> Trend og sparklines viser kun hele måneder (`dim_date[is_complete_month]`). Januar 2014 er en kendt anomali: 28 dage med data, men kun 2,4 % af decembers omsætning – sandsynligvis et ufuldstændigt udtræk.
+*English version: [Guide_dwh_gold_en.md](Guide_dwh_gold_en.md)*
 
 Trin-for-trin-guide til datavarehuset `dwh_gold`: medallion-lagene i Supabase (bronze → silver → gold),
 Power BI-modellen i PBIP/TMDL og dashboardet "Salgsoverblik".
@@ -74,7 +72,7 @@ Begge procedurer tømmer og genopbygger deres tabeller, så de kan køres igen n
 Kør `sql/tests/quality_checks_silver.sql` og `sql/tests/quality_checks_gold.sql`. Alle fejltjek skal give 0.
 Kendte, accepterede afvigelser:
 
-- 19 salgslinjer har ugyldig ordredato i kilden. Datoen afledes i silver (samme ordre, ellers afsendelsesdato − 7) og markeres `order_date_derived` – se [model-decisions.md](model-decisions.md).
+- 19 salgslinjer har ugyldig ordredato i kilden → `order_date` er tom.
 - 15 kunder har fødselsdato før 1924; fremtidige fødselsdatoer er sat til tom i silver.
 
 ### 2.5 Power BI-bruger
@@ -106,7 +104,7 @@ alter role powerbi_reader with password '<dit-password>';
 
 | Parameter | Værdi |
 |---|---|
-| `PgServer` | Session pooler-host fra Supabase (*Connect → Session pooler*), fx `aws-0-<region>.pooler.supabase.com` |
+| `PgServer` | Session pooler-host fra Supabase (*Connect → Session pooler*), fx `aws-0-eu-west-2.pooler.supabase.com` |
 | `PgDatabase` | `postgres` |
 
 Login: fanen **Database**, brugernavn `powerbi_reader.<projekt-id>`, password fra trin 2.5.
@@ -161,7 +159,7 @@ dwh_gold.SemanticModel/definition/
 Eksempler:
 
 ```dax
-Kostpris = SUMX ( fact_sales, fact_sales[quantity] * fact_sales[unit_cost] )   -- kostpris på ordredatoen
+Kostpris = SUMX ( fact_sales, fact_sales[quantity] * RELATED ( dim_products[cost] ) )
 Dækningsbidrag = [Omsætning] - [Kostpris]
 Margin % = DIVIDE ( [Dækningsbidrag], [Omsætning] )
 
@@ -179,11 +177,11 @@ kategori-søjler, top 10-tabel og fremhævninger).
 
 | Element | Indhold | Værdi |
 |---|---|---|
-| KPI-fliser | Omsætning, Ordrer, Dækningsbidrag, Margin % | 29.356.250 · 27.659 · 12.389.834 · 42,2 % |
+| KPI-fliser | Omsætning, Ordrer, Dækningsbidrag, Margin % | 29.356.250 · 27.659 · 11.685.757 · 39,8 % |
 | Trend | Omsætning pr. måned med trendlinje og zoom | 2010–2014 |
 | Månedskort | Omsætning, ordrer, kunder i december 2013 vs. november | 1.874.128 (+5,2 %) · 2.192 (+5,0 %) · 2.133 (+4,8 %) |
-| Søjler | Ordrer med kategorien (en ordre kan tælle i flere kategorier) | Accessories 18.208 · Bikes 15.205 · Clothing 7.461 |
-| Tabel | Top 10 produkter efter ordrer med produktet, med omsætning og margin % | Water Bottle – 30 oz. øverst |
+| Søjler | Ordrer pr. kategori | Accessories 18.208 · Bikes 15.205 · Clothing 7.461 |
+| Tabel | Top 10 produkter efter ordrer, med omsætning og margin % | Water Bottle – 30 oz. øverst |
 | Fremhævninger | Mest bestilte underkategori, største land | Tires and Tubes · United States |
 
 Der findes ingen returdata, så forlæggets "Return Rate" er erstattet af margin %.

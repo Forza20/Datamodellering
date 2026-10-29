@@ -3,8 +3,6 @@
 Step-by-step guide to the `dwh_gold` data warehouse: the medallion layers in Supabase (bronze → silver → gold),
 the Power BI model in PBIP/TMDL and the "Salgsoverblik" (Sales overview) dashboard.
 
-> Model decisions (Danish): [model-decisions.md](model-decisions.md). Trend and sparklines show complete months only (`dim_date[is_complete_month]`); January 2014 is a known anomaly (28 days of data but 2.4% of December's revenue – most likely an incomplete extract).
-
 > The model and report use Danish names (for example `Omsætning` = revenue, `Antal ordrer` = number of orders).
 > English translations are given in parentheses where it helps.
 
@@ -75,7 +73,7 @@ Both procedures truncate and rebuild their tables, so they can be rerun at any t
 Run `sql/tests/quality_checks_silver.sql` and `sql/tests/quality_checks_gold.sql`. Every error check must return 0.
 Known, accepted exceptions:
 
-- 19 sales lines have an invalid order date in the source. The date is derived in silver (same order, otherwise ship date − 7) and flagged `order_date_derived` – see [model-decisions.md](model-decisions.md).
+- 19 sales lines have an invalid order date in the source → `order_date` is empty.
 - 15 customers have a birth date before 1924; future birth dates are set to empty in silver.
 
 ### 2.5 Power BI user
@@ -107,7 +105,7 @@ Open `output/dwh_gold/dwh_gold.pbip`. The file must sit next to the `dwh_gold.Re
 
 | Parameter | Value |
 |---|---|
-| `PgServer` | Session pooler host from Supabase (*Connect → Session pooler*), e.g. `aws-0-<region>.pooler.supabase.com` |
+| `PgServer` | Session pooler host from Supabase (*Connect → Session pooler*), e.g. `aws-0-eu-west-2.pooler.supabase.com` |
 | `PgDatabase` | `postgres` |
 
 Sign-in: the **Database** tab, user name `powerbi_reader.<project-id>`, password from step 2.5.
@@ -162,7 +160,7 @@ dwh_gold.SemanticModel/definition/
 Examples:
 
 ```dax
-Kostpris = SUMX ( fact_sales, fact_sales[quantity] * fact_sales[unit_cost] )   -- cost at the order date
+Kostpris = SUMX ( fact_sales, fact_sales[quantity] * RELATED ( dim_products[cost] ) )
 Dækningsbidrag = [Omsætning] - [Kostpris]
 Margin % = DIVIDE ( [Dækningsbidrag], [Omsætning] )
 
@@ -180,11 +178,11 @@ category bars, top 10 table and highlight tiles).
 
 | Element | Content | Value |
 |---|---|---|
-| KPI tiles | Revenue, Orders, Gross margin, Margin % | 29,356,250 · 27,659 · 12,389,834 · 42.2% |
+| KPI tiles | Revenue, Orders, Gross margin, Margin % | 29,356,250 · 27,659 · 11,685,757 · 39.8% |
 | Trend | Revenue per month with trend line and zoom | 2010–2014 |
 | Monthly cards | Revenue, orders, customers in December 2013 vs. November | 1,874,128 (+5.2%) · 2,192 (+5.0%) · 2,133 (+4.8%) |
-| Bars | Orders containing the category (an order can count in several) | Accessories 18,208 · Bikes 15,205 · Clothing 7,461 |
-| Table | Top 10 products by orders containing the product, with revenue and margin % | Water Bottle – 30 oz. at the top |
+| Bars | Orders per category | Accessories 18,208 · Bikes 15,205 · Clothing 7,461 |
+| Table | Top 10 products by orders, with revenue and margin % | Water Bottle – 30 oz. at the top |
 | Highlights | Most ordered subcategory, largest country | Tires and Tubes · United States |
 
 There is no returns data, so the template's "Return Rate" was replaced by margin %.

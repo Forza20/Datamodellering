@@ -41,11 +41,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Omsætning hele måneder"
+                  "Property": "Omsætning"
                 }
               },
-              "queryRef": "_Measures.Omsætning hele måneder",
-              "nativeQueryRef": "Omsætning hele måneder"
+              "queryRef": "_Measures.Omsætning",
+              "nativeQueryRef": "Omsætning"
             }
           ]
         }

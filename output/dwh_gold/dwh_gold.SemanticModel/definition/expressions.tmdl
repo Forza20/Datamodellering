@@ -1,6 +1,5 @@
-/// Supabase session pooler-host (Connect > Session pooler). Pladsholder i repoet – sæt din egen host lokalt,
-/// og ret værdien tilbage til pladsholderen før commit (beslutning R4-1).
-expression PgServer = "aws-0-REGION.pooler.supabase.com" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+/// Supabase pooler (session mode) inkl. port. Find host under Project Settings > Database > Connection pooling.
+expression PgServer = "aws-0-eu-west-2.pooler.supabase.com" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
 	lineageTag: 31b5be63-a09d-45fc-9f8d-be5a7c877f85
 	queryGroup: Parametre
 
@@ -14,7 +13,7 @@ expression PgDatabase = "postgres" meta [IsParameterQuery=true, Type="Text", IsP
 
 	annotation PBI_ResultType = Text
 
-/// Fælles forbindelse til Supabase. Login: powerbi_reader.<project-ref> (Database-credentials).
+/// Fælles forbindelse til Supabase. Login: powerbi_reader.spihvuokluprvafmchvn (Database-credentials).
 expression GoldKilde =
 		let
 			Kilde = PostgreSQL.Database(PgServer, PgDatabase)
