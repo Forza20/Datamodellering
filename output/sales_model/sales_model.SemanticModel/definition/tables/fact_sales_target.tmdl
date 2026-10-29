@@ -1,6 +1,8 @@
+/// Månedlige salgsmål fra sales_targets-arket, én række pr. måned.
 table fact_sales_target
 	lineageTag: c254a1e9-fb10-49bb-9392-7532755ffa33
 
+	/// Første dag i måneden for salgsmålet. Relation til dim_date.
 	column date_key
 		dataType: dateTime
 		isHidden
@@ -12,6 +14,7 @@ table fact_sales_target
 		annotation SummarizationSetBy = Automatic
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Salgsmål for måneden i kroner.
 	column target_amount
 		dataType: decimal
 		isHidden

@@ -1,6 +1,8 @@
+/// Salgskanaler som fast liste i Power Query: Web, Butik, Telefon, Partner og Ukendt.
 table dim_channel
 	lineageTag: 3a4a7e22-f238-422a-8b2d-e7b9b65bb931
 
+	/// Kanalnøgle (10 Web, 20 Butik, 30 Telefon, 40 Partner, -1 Ukendt).
 	column channel_key
 		dataType: int64
 		isHidden
@@ -11,6 +13,7 @@ table dim_channel
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Salgskanalens navn.
 	column channel_name
 		dataType: string
 		lineageTag: 9028d0aa-c7f8-47dc-95a8-12cb6b4c45f6

@@ -1,6 +1,8 @@
+/// Lagerbeholdning pr. produkt pr. måned. Arket har én kolonne pr. måned og er unpivoteret i Power Query.
 table fact_inventory
 	lineageTag: 0d6a261f-d8b9-4151-a8d9-b9ee2e369aa8
 
+	/// Første dag i måneden for lagerbeholdningen. Relation til dim_date.
 	column date_key
 		dataType: dateTime
 		isHidden
@@ -12,6 +14,7 @@ table fact_inventory
 		annotation SummarizationSetBy = Automatic
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Nøgle til dim_product.
 	column product_key
 		dataType: int64
 		isHidden
@@ -22,6 +25,7 @@ table fact_inventory
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Lagerbeholdning i stk. ved månedens opgørelse. Må ikke summeres over tid.
 	column stock_qty
 		dataType: int64
 		isHidden

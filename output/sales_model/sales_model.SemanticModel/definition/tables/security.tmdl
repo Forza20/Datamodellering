@@ -1,7 +1,9 @@
+/// Skjult tabel til rækkesikkerhed (RLS): kobler brugerens e-mail til den region, brugeren må se.
 table security
 	isHidden
 	lineageTag: c94d2442-3d70-4954-bdd1-2ed8c71de04e
 
+	/// Brugerens e-mail i små bogstaver. Matches mod USERPRINCIPALNAME() i rollen Region.
 	column user_email
 		dataType: string
 		isHidden
@@ -11,6 +13,7 @@ table security
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Region, brugeren har adgang til.
 	column region
 		dataType: string
 		isHidden

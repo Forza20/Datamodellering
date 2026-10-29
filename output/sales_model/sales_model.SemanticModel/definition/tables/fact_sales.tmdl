@@ -1,6 +1,8 @@
+/// Salgsfakta med én række pr. ordrelinje: ordre, kunde, produkt, kanal, region, status samt brutto, rabat, netto og kostpris.
 table fact_sales
 	lineageTag: e5f6668f-c29c-45c6-8389-e9432dedd16e
 
+	/// Ordrelinjens id.
 	column line_id
 		dataType: string
 		lineageTag: f7922197-ff9c-4a14-80eb-72aedf9947c3
@@ -9,6 +11,7 @@ table fact_sales
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Ordrens id. Flere linjer kan have samme ordre.
 	column order_id
 		dataType: string
 		lineageTag: c591b242-f368-470b-889f-5dc03ecc3a2e
@@ -17,6 +20,7 @@ table fact_sales
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Ordredato. Relation til dim_date.
 	column date_key
 		dataType: dateTime
 		isHidden
@@ -28,6 +32,7 @@ table fact_sales
 		annotation SummarizationSetBy = Automatic
 		annotation UnderlyingDateTimeDataType = Date
 
+	/// Nøgle til dim_customer. -1 hvis kunden ikke findes.
 	column customer_key
 		dataType: int64
 		isHidden
@@ -38,6 +43,7 @@ table fact_sales
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Nøgle til dim_product. -1 hvis produktet ikke findes.
 	column product_key
 		dataType: int64
 		isHidden
@@ -48,6 +54,7 @@ table fact_sales
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Nøgle til dim_channel. -1 hvis kanalen ikke findes.
 	column channel_key
 		dataType: int64
 		isHidden
@@ -58,6 +65,7 @@ table fact_sales
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Nøgle til dim_region. -1 hvis regionen ikke findes.
 	column region_key
 		dataType: int64
 		isHidden
@@ -68,6 +76,7 @@ table fact_sales
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Ordrestatus på dansk: Leveret, Afsendt eller Under behandling.
 	column order_status
 		dataType: string
 		lineageTag: 6ddf8dfb-6344-499b-91b8-56dca1b2c5d4
@@ -76,6 +85,7 @@ table fact_sales
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Ordreprioritet, fx Ekspres.
 	column order_priority
 		dataType: string
 		lineageTag: 375cd0b4-70f9-40a2-bc15-021602201abc
@@ -84,6 +94,7 @@ table fact_sales
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Antal enheder på ordrelinjen.
 	column quantity
 		dataType: int64
 		isHidden
@@ -94,6 +105,7 @@ table fact_sales
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Enhedspris før rabat.
 	column unit_price
 		dataType: decimal
 		isHidden
@@ -104,6 +116,7 @@ table fact_sales
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Rabat i procent på ordrelinjen (0 hvis tom).
 	column discount_pct
 		dataType: double
 		isHidden
@@ -114,6 +127,7 @@ table fact_sales
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Bruttobeløb: antal × enhedspris, afrundet til 2 decimaler.
 	column gross_amount
 		dataType: decimal
 		isHidden
@@ -124,6 +138,7 @@ table fact_sales
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Rabatbeløb: bruttobeløb minus nettobeløb.
 	column discount_amount
 		dataType: decimal
 		isHidden
@@ -134,6 +149,7 @@ table fact_sales
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Nettobeløb efter rabat: bruttobeløb × (1 − rabat %), afrundet til 2 decimaler.
 	column net_amount
 		dataType: decimal
 		isHidden
@@ -144,6 +160,7 @@ table fact_sales
 
 		annotation SummarizationSetBy = Automatic
 
+	/// Kostpris for ordrelinjen: antal × enhedskost, afrundet til 2 decimaler.
 	column cost_amount
 		dataType: decimal
 		isHidden
