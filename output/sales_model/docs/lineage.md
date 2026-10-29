@@ -1,6 +1,6 @@
 # Data lineage – sales_model
 
-Genereret 2026-10-29 20:03 af pbip-catalog. Farver: sort = datakilde, grå = Power Query, mørk = tabel, hvid = kolonne, turkis = measure, rosa = dashboard.
+Genereret 2026-10-29 20:08 af pbip-catalog. Farver: sort = datakilde, grå = Power Query, mørk = tabel, hvid = kolonne, turkis = measure, rosa = dashboard.
 
 ## Overblik (tabelniveau)
 
@@ -168,8 +168,8 @@ flowchart LR
 | `product_code` | products (Sheet).ProductCode | slv_product: Navigation (products (Sheet)) → slv_product: Transformeret ({"ProductCode", Text.Trim, type text}) → dim_product: Omdøbt (ProductCode → product_code) → dim_product: Samlet (append) (Typer, Ukendt) |
 | `product_name` | products (Sheet).ProductName | slv_product: Navigation (products (Sheet)) → slv_product: Transformeret ({"ProductName", Text.Trim, type text}) → dim_product: Omdøbt (ProductName → product_name) → dim_product: Samlet (append) (Typer, Ukendt) |
 | `brand` | products (Sheet).Brand | slv_product: Navigation (products (Sheet)) → slv_product: Transformeret ({"Brand", Text.Trim, type text}) → dim_product: Omdøbt (Brand → brand) → dim_product: Samlet (append) (Typer, Ukendt) |
-| `category` | SubLower[Category] | dim_product: Hentet via join (SubLower[Category]) → dim_product: Omdøbt (Category → category) → dim_product: Samlet (append) (Typer, Ukendt) |
-| `subcategory` | SubLower[Subcategory] | dim_product: Hentet via join (SubLower[Subcategory]) → dim_product: Omdøbt (Subcategory → subcategory) → dim_product: Samlet (append) (Typer, Ukendt) |
+| `category` | subcategories (Sheet).CategorySubcategory | slv_subcategory: Navigation (subcategories (Sheet)) → slv_subcategory: Opdelt (CategorySubcategory → Category (skilletegn "\|")) → slv_subcategory: Transformeret ({"Category", each Text.Proper(Text.Trim(_)), type text}) → dim_product: Hentet via join (SubLower[Category]) → dim_product: Omdøbt (Category → category) → dim_product: Samlet (append) (Typer, Ukendt) |
+| `subcategory` | subcategories (Sheet).CategorySubcategory | slv_subcategory: Navigation (subcategories (Sheet)) → slv_subcategory: Opdelt (CategorySubcategory → Subcategory (skilletegn "\|")) → slv_subcategory: Transformeret ({"Subcategory", each Text.Proper(Text.Trim(_)), type text}) → dim_product: Hentet via join (SubLower[Subcategory]) → dim_product: Omdøbt (Subcategory → subcategory) → dim_product: Samlet (append) (Typer, Ukendt) |
 | `list_price` | products (Sheet).UnitPrice | slv_product: Navigation (products (Sheet)) → dim_product: Omdøbt (UnitPrice → list_price) → dim_product: Samlet (append) (Typer, Ukendt) |
 | `primary_supplier` | products (Sheet).PrimarySupplier | slv_product: Navigation (products (Sheet)) → slv_product: Transformeret ({"PrimarySupplier", Text.Trim, type text}) → dim_product: Omdøbt (PrimarySupplier → primary_supplier) → dim_product: Samlet (append) (Typer, Ukendt) |
 
@@ -205,7 +205,7 @@ flowchart LR
 |---|---|---|
 | `date_key` | Beregnet i slv_inventory (trin MedDato) | slv_inventory: Beregnet (each Date.FromText([Period] & "-01", [Format = "yyyy-MM-dd"…) → fact_inventory: Omdøbt (MonthStart → date_key) |
 | `product_key` | Beregnet i dim_product (trin MedKey) | dim_product: Indeks/nøgle (Fortløbende nummer fra 1) → dim_product: Samlet (append) (Typer, Ukendt) → fact_inventory: Hentet via join (dim_product[product_key]) → fact_inventory: Værdier erstattet (null, -1) |
-| `stock_qty` | inventory (Sheet).StockQty | slv_inventory: Navigation (inventory (Sheet)) → fact_inventory: Omdøbt (StockQty → stock_qty) |
+| `stock_qty` | inventory (Sheet).(alle kolonner undtagen ProductName) | slv_inventory: Navigation (inventory (Sheet)) → slv_inventory: Unpivot (StockQty = værdier fra alle kolonner undtagen ProductName) → fact_inventory: Omdøbt (StockQty → stock_qty) |
 
 </details>
 

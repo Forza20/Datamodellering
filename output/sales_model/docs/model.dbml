@@ -111,15 +111,15 @@ Table "dim_product" [headercolor: #605E5C] {
   "product_code" string [note: 'Produktkode fra produktarket (forretningsnøgle). · Oprindelse: products (Sheet).ProductCode']
   "product_name" string [note: 'Produktnavn. · Oprindelse: products (Sheet).ProductName · Mulig PII']
   "brand" string [note: 'Produktets brand. · Oprindelse: products (Sheet).Brand']
-  "category" string [note: 'Produktkategori, slået op via underkategorien (match uden forskel på store og små bogstaver). · Oprindelse: SubLower[Category]']
-  "subcategory" string [note: 'Produktets underkategori. · Oprindelse: SubLower[Subcategory]']
+  "category" string [note: 'Produktkategori, slået op via underkategorien (match uden forskel på store og små bogstaver). · Oprindelse: subcategories (Sheet).CategorySubcategory']
+  "subcategory" string [note: 'Produktets underkategori. · Oprindelse: subcategories (Sheet).CategorySubcategory']
   "list_price" decimal [note: 'Listepris pr. stk. · Oprindelse: products (Sheet).UnitPrice']
   "primary_supplier" string [note: 'Produktets primære leverandør. · Oprindelse: products (Sheet).PrimarySupplier']
 
   Note: '''Produktdimension med kategori og underkategori. Har en Ukendt-række med nøgle -1.
 Type: Dimension
 Kilde: Excel File: C:\\Users\\maria\\Desktop\\Claude\\Data Modeling\\data\\silver\\Silver_Excel.xlsx
-Kildeobjekter: products (Sheet)
+Kildeobjekter: products (Sheet), subcategories (Sheet)
 Power Query: slv_product, slv_subcategory'''
 }
 
@@ -151,7 +151,7 @@ Power Query: dim_campaign, slv_campaign_log'''
 Table "fact_inventory" [headercolor: #333333] {
   "date_key" dateTime [note: 'Første dag i måneden for lagerbeholdningen. Relation til dim_date. · Skjult · Oprindelse: Beregnet i slv_inventory (trin MedDato)']
   "product_key" int64 [note: 'Nøgle til dim_product. · Skjult · Oprindelse: Beregnet i dim_product (trin MedKey)']
-  "stock_qty" int64 [note: 'Lagerbeholdning i stk. ved månedens opgørelse. Må ikke summeres over tid. · Skjult · Oprindelse: inventory (Sheet).StockQty']
+  "stock_qty" int64 [note: 'Lagerbeholdning i stk. ved månedens opgørelse. Må ikke summeres over tid. · Skjult · Oprindelse: inventory (Sheet).(alle kolonner undtagen ProductName)']
 
   Note: '''Lagerbeholdning pr. produkt pr. måned. Arket har én kolonne pr. måned og er unpivoteret i Power Query.
 Type: Fakta
