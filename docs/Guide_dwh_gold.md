@@ -39,6 +39,8 @@ Alle tabeller og procedurer oprettes af migrationerne i `supabase/migrations/` i
 4. `..._create_silver_load_procedure.sql` – `silver.load_silver()`
 5. `..._create_gold_star_schema.sql` – gold-tabeller + `gold.load_gold()`
 6. `..._powerbi_reader_access.sql` – read-only bruger, RLS-policies og fast `search_path`
+7. `..._revert_model_decisions.sql` – ruller en tidligere modelændring tilbage (ingen effekt på en ny database)
+8. `..._schedule_daily_load.sql` – dagligt pg_cron-job, der bygger silver og gold (afsnit 7)
 
 ### 2.2 Indlæs bronze
 CSV-filerne indlæses i Supabase **Table Editor** (skema `bronze` → tabel → *Insert → Import data from CSV*).
@@ -200,10 +202,36 @@ Der findes ingen returdata, så forlæggets "Return Rate" er erstattet af margin
 
 ## 7. Opdatering af data
 
-Intet opdateres automatisk:
+1. Indlæs nye CSV-filer i bronze (2.2). Det sker **manuelt**.
+2. Silver og gold bygges **automatisk** hver dag (se 7.1). Vil du ikke vente, så kør `call silver.load_silver(); call gold.load_gold();` (2.3).
+3. Klik **Opdater** i Power BI. Det sker **manuelt**, så længe rapporten kun ligger i Desktop.
 
-1. Indlæs nye CSV-filer i bronze (2.2).
-2. Kør `call silver.load_silver(); call gold.load_gold();` (2.3).
-3. Klik **Opdater** i Power BI.
+### 7.1 Dagligt job (pg_cron)
+Migration 8 opretter jobbet `daily_load_silver_gold`:
 
-Planlagt opdatering kan tilføjes senere med `pg_cron` i Supabase.
+| | |
+|---|---|
+| Tidspunkt | `0 5 * * *` = 05:00 UTC (kl. 06 dansk vintertid, kl. 07 sommertid) |
+| Kommando | `call silver.load_silver(); call gold.load_gold();` |
+
+Kør i SQL Editor:
+
+```sql
+-- Jobbet
+select jobid, jobname, schedule, command, active from cron.job;
+
+-- Seneste kørsler (status skal være 'succeeded')
+select status, return_message, start_time, end_time
+from cron.job_run_details order by start_time desc limit 10;
+
+-- Skift tidspunkt (samme navn opdaterer jobbet)
+select cron.schedule('daily_load_silver_gold', '0 4 * * *',
+    $$call silver.load_silver(); call gold.load_gold();$$);
+
+-- Stop jobbet
+select cron.unschedule('daily_load_silver_gold');
+```
+
+Bemærk:
+- Jobbet bygger kun ud fra det, der ligger i bronze. Uden nye CSV-data giver det de samme tal.
+- Gratis-planen pauser projektet efter ca. 7 dage uden aktivitet, og så kører jobbet ikke. Genstart under *Restore* i Supabase.

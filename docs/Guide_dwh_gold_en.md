@@ -40,6 +40,8 @@ All tables and procedures are created by the migrations in `supabase/migrations/
 4. `..._create_silver_load_procedure.sql` – `silver.load_silver()`
 5. `..._create_gold_star_schema.sql` – gold tables + `gold.load_gold()`
 6. `..._powerbi_reader_access.sql` – read-only user, RLS policies and a fixed `search_path`
+7. `..._revert_model_decisions.sql` – rolls back an earlier model change (no effect on a new database)
+8. `..._schedule_daily_load.sql` – daily pg_cron job that builds silver and gold (section 7)
 
 ### 2.2 Load bronze
 Load the CSV files with the Supabase **Table Editor** (schema `bronze` → table → *Insert → Import data from CSV*).
@@ -201,10 +203,36 @@ There is no returns data, so the template's "Return Rate" was replaced by margin
 
 ## 7. Refreshing data
 
-Nothing refreshes automatically:
+1. Load new CSV files into bronze (2.2). This is **manual**.
+2. Silver and gold are rebuilt **automatically** every day (see 7.1). To skip the wait, run `call silver.load_silver(); call gold.load_gold();` (2.3).
+3. Click **Refresh** in Power BI. This is **manual** as long as the report only lives in Desktop.
 
-1. Load new CSV files into bronze (2.2).
-2. Run `call silver.load_silver(); call gold.load_gold();` (2.3).
-3. Click **Refresh** in Power BI.
+### 7.1 Daily job (pg_cron)
+Migration 8 creates the job `daily_load_silver_gold`:
 
-Scheduled refresh can be added later with `pg_cron` in Supabase.
+| | |
+|---|---|
+| Schedule | `0 5 * * *` = 05:00 UTC (06:00 Danish winter time, 07:00 summer time) |
+| Command | `call silver.load_silver(); call gold.load_gold();` |
+
+Run in the SQL Editor:
+
+```sql
+-- The job
+select jobid, jobname, schedule, command, active from cron.job;
+
+-- Latest runs (status should be 'succeeded')
+select status, return_message, start_time, end_time
+from cron.job_run_details order by start_time desc limit 10;
+
+-- Change the time (the same name updates the job)
+select cron.schedule('daily_load_silver_gold', '0 4 * * *',
+    $$call silver.load_silver(); call gold.load_gold();$$);
+
+-- Stop the job
+select cron.unschedule('daily_load_silver_gold');
+```
+
+Note:
+- The job only builds from what is in bronze. Without new CSV data it produces the same numbers.
+- The free plan pauses the project after about 7 days without activity, and then the job does not run. Restart it under *Restore* in Supabase.
