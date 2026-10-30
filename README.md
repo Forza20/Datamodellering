@@ -10,9 +10,25 @@ Medallion gold-lag og semantisk model til Power BI (PBIP/TMDL), bygget fra en si
 | `docs/naming_conventions.md` | Navngivningsregler (snake_case, `fact_` / `dim_`, `<navn>_key`) |
 | `docs/Guide_datamodellering.pdf` / `.docx` | Guide til fremtidige projekter |
 | `data/silver/` | Silver-Excel (kildedata) |
-| `diagrams/sales_model.dbml` | Stjerneskema til [dbdiagram.io](https://dbdiagram.io/d) |
+| `diagrams/sales_model.dbml`, `diagrams/dwh_gold.dbml` | Stjerneskemaer til [dbdiagram.io](https://dbdiagram.io/d) og [dbdocs](https://dbdocs.io) |
 | `output/sales_model/` | PBIP-projekt (åbn `sales_model.pbip` i Power BI Desktop) |
+| `output/<model>/docs/` | Data catalog (`catalog.xlsx`), lineage (`lineage.md`, `lineage.azdo.md`) og `model.dbml` |
 | `output/m/` | Power Query M-kode, én fil pr. forespørgsel |
+
+## Online dokumentation (dbdocs)
+
+| Model | Link |
+| --- | --- |
+| `sales_model` | https://dbdocs.io/peter-bekker/sales_model |
+| `dwh_gold` | https://dbdocs.io/peter-bekker/dwh_gold |
+
+Opdatér siderne efter ændringer i en `.dbml`-fil:
+
+```
+npx dbdocs build diagrams/sales_model.dbml
+```
+
+Kræver miljøvariablen `DBDOCS_TOKEN` (lav den med `npx dbdocs token -g`).
 
 ## Modellen `sales_model`
 

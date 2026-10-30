@@ -5,3 +5,8 @@
 **/.pbi/localSettings.json
 **/.pbi/cache.abf
 .mcp.json
+
+# Hemmeligheder og lokale indstillinger
+.env
+.env.*
+.claude/settings.local.json
