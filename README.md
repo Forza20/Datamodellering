@@ -22,10 +22,11 @@ Medallion gold-lag og semantisk model til Power BI (PBIP/TMDL), bygget fra en si
 | `sales_model` | https://dbdocs.io/peter-bekker/sales_model |
 | `dwh_gold` | https://dbdocs.io/peter-bekker/dwh_gold |
 
-Opdatér siderne efter ændringer i en `.dbml`-fil:
+Siderne bygges fra `output/<model>/docs/model.dbml` (genereret med beskrivelser, measures og lineage). Opdatér dem efter en ny generering:
 
 ```
-npx dbdocs build diagrams/sales_model.dbml
+npx dbdocs build output/sales_model/docs/model.dbml --project sales_model --public
+npx dbdocs build output/dwh_gold/docs/model.dbml --project dwh_gold --public
 ```
 
 Kræver miljøvariablen `DBDOCS_TOKEN` (lav den med `npx dbdocs token -g`).
