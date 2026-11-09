@@ -1,6 +1,6 @@
 # Datamodellering
 
-Medallion gold-lag og semantisk model til Power BI (PBIP/TMDL), bygget fra en silver-Excel med Claude Code.
+Medallion gold-lag og semantisk model til Power BI (PBIP/TMDL), bygget med Claude Code: `sales_model` fra en silver-Excel og `dwh_gold` fra Supabase.
 
 ## Indhold
 
@@ -14,6 +14,12 @@ Medallion gold-lag og semantisk model til Power BI (PBIP/TMDL), bygget fra en si
 | `output/sales_model/` | PBIP-projekt (åbn `sales_model.pbip` i Power BI Desktop) |
 | `output/<model>/docs/` | Data catalog (`catalog.xlsx`), lineage (`lineage.md`, `lineage.azdo.md`) og `model.dbml` |
 | `output/m/` | Power Query M-kode, én fil pr. forespørgsel |
+| `output/dwh_gold/` | PBIP-projekt `dwh_gold` |
+| `supabase/migrations/` | bronze/silver/gold-skemaer og daglig load |
+| `sql/tests/` | kvalitetstjek af silver og gold |
+| `scripts/load_bronze.ps1` | CSV til bronze via psql |
+| `docs/Guide_dwh_gold.md` / `docs/Guide_dwh_gold_en.md` | Guide til dwh_gold (dansk/engelsk) |
+| `docs/Guide_brug_af_projektet.pdf` | Guide til brug af projektet |
 
 ## Online dokumentation (dbdocs)
 
