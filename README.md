@@ -15,6 +15,9 @@ Medallion gold-lag og semantisk model til Power BI (PBIP/TMDL), bygget med Claud
 | `output/<model>/docs/` | Data catalog (`catalog.xlsx`), lineage (`lineage.md`, `lineage.azdo.md`) og `model.dbml` |
 | `output/m/` | Power Query M-kode, én fil pr. forespørgsel |
 | `output/dwh_gold/` | PBIP-projekt `dwh_gold` |
+| `output/dwh_gold/measures_forslag.md` | De 17 measures i `_Measures` (tilføjet modellen) |
+| `output/sales_model.zip` | Zip af PBIP-projektet `sales_model` |
+| `project_datamodel_pbip.zip` | Ældre eksempel på færdig PBIP (`project_datamodel`) |
 | `supabase/migrations/` | bronze/silver/gold-skemaer og daglig load |
 | `sql/tests/` | kvalitetstjek af silver og gold |
 | `scripts/load_bronze.ps1` | CSV til bronze via psql |

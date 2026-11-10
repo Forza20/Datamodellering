@@ -19,4 +19,4 @@ Medallion gold-lag + semantisk model til Power BI (PBIP/TMDL). To modeller: `sal
 - Eksempel på færdig PBIP: `project_datamodel_pbip.zip`
 
 ## Stil
-Korte danske punkter. Spørg hellere end at gætte.
+Korte danske punkter. Spørg hellere end at gætte ved risikable eller irreversible skridt. I beslutningsinterviews gælder den globale regel: vælg anbefalingen og log den.
